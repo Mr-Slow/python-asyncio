@@ -5,9 +5,8 @@ async def set_after(fut, delay, value):
     # Sleep for *delay* seconds.
     await asyncio.sleep(delay)
     print('hhh')
-
-    # Set *value* as a result of *fut* Future.
-    #fut.set_result(value)
+    if not fut.done():
+        fut.set_result(value)
 
 async def main():
     loop = asyncio.get_running_loop()
@@ -17,7 +16,7 @@ async def main():
     loop.create_task(
         set_after(fut, 1, '... world'))
     loop.create_task(
-        set_after(fut, 1, '... world2'))
+        set_after(fut, 2, '... world2'))
 
     print('hello ...')
 

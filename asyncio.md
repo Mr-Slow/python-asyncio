@@ -107,7 +107,58 @@ If the wrapped coroutine is not done, this returns the stack where it is suspend
 
 获取future绑定的事件循环对象;
 
-#### 2.4 api
+(8)asyncio.isfuture(obj)<br>
+判断一个对象是否为future对象；
+
+(9)asyncio.ensure_future(obj, \*, loop=None)<br>
+创建task对象；
+
+(10)asyncio.wrap_future(future, \*, loop=None)<br>
+将一个concurrent.futures.Future对象封装为asyncio.Future对象；
+#### 2.4 event loop
+>The event loop is the core of every asyncio application. Event loops run asynchronous tasks and callbacks, perform network IO operations, and run subprocesses.
+
+asyncio用event loop来运行异步任务和回调函数，建立或监听网络连接，运行子程序；
+
+(1)loop.run_until_complete(future)
+>Run until the future (an instance of Future) has completed.
+
+运行事件循环直到future执行完成；
+
+(2)loop.run_forever()
+>Run the event loop until stop() is called.
+
+运行事件循环直到stop()执行；
+
+(3)loop.stop()/loop.is_running()/loop.is_closed()/loop.close()
+>If stop() is called while run_forever() is running, the loop will run the current batch of callbacks and then exit.
+
+(4)loop.shutdown_asyncgens()
+>Schedule all currently open asynchronous generator objects to close with an aclose() call. After calling this method, the event loop will issue a warning if a new asynchronous generator is iterated. This should be used to reliably finalize all scheduled asynchronous generators.
+
+(5)loop.call_soon(callback, \*args, context=None)
+>Schedule a callback to be called with args arguments at the next iteration of the event loop.
+
+在事件循环的下一次迭代中执行回调；
+loop.call_soon_threadsafe(callback, \*args, context=None)线程安全版
+
+(6)loop.call_later(delay, callback, \*args, context=None)
+loop.call_at(when, callback, \*args, context=None)<br>
+设置回调运行的时间;
+
+(7)loop.create_future() / loop.create_task(coro)
+创建future/task对象；
+
+(8)loop.create_connection(protocol_factory, host=None, port=None, \*, ssl=None, family=0, proto=0, flags=0, sock=None, local_addr=None, server_hostname=None, ssl_handshake_timeout=None)
+以给定参数建立一个tcp连接，返回（transport, protocol)的元组；
+
+(9)loop.create_datagram_endpoint(protocol_factory, local_addr=None, remote_addr=None, \*, family=0, proto=0, flags=0, reuse_address=None, reuse_port=None, allow_broadcast=None, sock=None)
+返回（transport, protocol)的元组,用于udp通信；
+
+(10)loop.create_unix_connection(protocol_factory, path=None, \*, ssl=None, sock=None, server_hostname=None, ssl_handshake_timeout=None)
+创建基于Unix文件的连接，返回（transport, protocol)的元组；
+
+#### 2.5 api
 (1)asyncio.run(coro, \*, debug=False)
 > This function runs the passed coroutine, taking care of managing the asyncio event loop and finalizing asynchronous generators.
 
@@ -243,7 +294,7 @@ Return a concurrent.futures.Future to wait for the result from another OS thread
 (13)asyncio.iscoroutinefunction(func)<br>
 判断一个对象是否是协程函数(async def 或者 @asyncio.coroutine)
 
-#### 2.5 Generator-based Coroutines
+#### 2.6 Generator-based Coroutines
 ```python
 import asyncio
 import time

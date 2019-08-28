@@ -136,51 +136,131 @@ asyncio用event loop来运行异步任务和回调函数，建立或监听网络
 (4)loop.shutdown_asyncgens()
 >Schedule all currently open asynchronous generator objects to close with an aclose() call. After calling this method, the event loop will issue a warning if a new asynchronous generator is iterated. This should be used to reliably finalize all scheduled asynchronous generators.
 
-(5)loop.call_soon(callback, \*args, context=None)
+##### 2.4.1 添加回调函数
+(1)loop.call_soon(callback, \*args, context=None)
 >Schedule a callback to be called with args arguments at the next iteration of the event loop.
 
 在事件循环的下一次迭代中执行回调；
 loop.call_soon_threadsafe(callback, \*args, context=None)线程安全版
+```python
+import asyncio
 
-(6)loop.call_later(delay, callback, \*args, context=None)
+def hello_world(loop):
+    """A callback to print 'Hello World' and stop the event loop"""
+    print('Hello World')
+    loop.stop()
+
+loop = asyncio.get_event_loop()
+
+# Schedule a call to hello_world()
+loop.call_soon(hello_world, loop)
+
+# Blocking call interrupted by loop.stop()
+try:
+    loop.run_forever()
+finally:
+    loop.close()
+```
+(2)loop.call_later(delay, callback, \*args, context=None)
 loop.call_at(when, callback, \*args, context=None)<br>
 设置回调运行的时间;
+```python
+import asyncio
+import datetime
 
-(7)loop.create_future() / loop.create_task(coro)
+def display_date(end_time, loop):
+    print(datetime.datetime.now())
+    if (loop.time() + 1.0) < end_time:
+        loop.call_later(1, display_date, end_time, loop)
+    else:
+        loop.stop()
+
+loop = asyncio.get_event_loop()
+
+# Schedule the first call to display_date()
+end_time = loop.time() + 5.0
+loop.call_soon(display_date, end_time, loop)
+
+# Blocking call interrupted by loop.stop()
+try:
+    loop.run_forever()
+finally:
+    loop.close()
+```
+
+##### 2.4.2 创建future，task对象
+(1)loop.create_future() / loop.create_task(coro)
 创建future/task对象；
 
-(8)loop.create_connection(protocol_factory, host=None, port=None, \*, ssl=None, family=0, proto=0, flags=0, sock=None, local_addr=None, server_hostname=None, ssl_handshake_timeout=None)<br>
+##### 2.4.3 创建网络连接
+(1)loop.create_connection(protocol_factory, host=None, port=None, \*, ssl=None, family=0, proto=0, flags=0, sock=None, local_addr=None, server_hostname=None, ssl_handshake_timeout=None)<br>
 以给定参数建立一个tcp连接，返回（transport, protocol)的元组；
 
-(9)loop.create_datagram_endpoint(protocol_factory, local_addr=None, remote_addr=None, \*, family=0, proto=0, flags=0, reuse_address=None, reuse_port=None, allow_broadcast=None, sock=None)<br>
+(2)loop.create_datagram_endpoint(protocol_factory, local_addr=None, remote_addr=None, \*, family=0, proto=0, flags=0, reuse_address=None, reuse_port=None, allow_broadcast=None, sock=None)<br>
 返回（transport, protocol)的元组,用于udp通信；
 
-(10)loop.create_unix_connection(protocol_factory, path=None, \*, ssl=None, sock=None, server_hostname=None, ssl_handshake_timeout=None)<br>
+(3)loop.create_unix_connection(protocol_factory, path=None, \*, ssl=None, sock=None, server_hostname=None, ssl_handshake_timeout=None)<br>
 创建基于Unix文件的连接，返回（transport, protocol)的元组；
 
-(11)loop.create_server(protocol_factory, host=None, port=None, \*, family=socket.AF_UNSPEC, flags=socket.AI_PASSIVE, sock=None, backlog=100, ssl=None, reuse_address=None, reuse_port=None, ssl_handshake_timeout=None, start_serving=True)<br>
+##### 2.4.4 创建network server
+(1)loop.create_server(protocol_factory, host=None, port=None, \*, family=socket.AF_UNSPEC, flags=socket.AI_PASSIVE, sock=None, backlog=100, ssl=None, reuse_address=None, reuse_port=None, ssl_handshake_timeout=None, start_serving=True)<br>
 创建tcp server监听对应的端口, 返回一个server对象;
 
-(12)loop.create_unix_server(protocol_factory, path=None, \*, sock=None, backlog=100, ssl=None, ssl_handshake_timeout=None, start_serving=True))<br>
+(2)loop.create_unix_server(protocol_factory, path=None, \*, sock=None, backlog=100, ssl=None, ssl_handshake_timeout=None, start_serving=True))<br>
 按对应的文件创建一个unix server, 返回一个server对象;
 
-(13)loop.connect_accepted_socket(protocol_factory, sock, \*, ssl=None, ssl_handshake_timeout=None)<br>
+(3)loop.connect_accepted_socket(protocol_factory, sock, \*, ssl=None, ssl_handshake_timeout=None)<br>
 将一个已经连接的socket对象封装为asyncio可处理的transport, protocol对象;
 
-(14)loop.sendfile(transport, file, offset=0, count=None, \*, fallback=True)<br>
+##### 2.4.5 发送文件
+(1)loop.sendfile(transport, file, offset=0, count=None, \*, fallback=True)<br>
 方法内部使用os.sendfile()发送文件;
 
-(15)loop.add_reader(fd, callback, \*args) / loop.remove_reader(fd)
+##### 2.4.6 监听文件描述符
+(1)loop.add_reader(fd, callback, \*args) / loop.remove_reader(fd)
 >Start monitoring the fd file descriptor for read availability and invoke callback with the specified arguments once fd is available for reading.)
 
 监听或取消对文件描述符, 如果文件描述符可读,则执行callback;
 
-(16loop.add_writer(fd, callback, \*args) / loop.remove_writer(fd)
+(2)loop.add_writer(fd, callback, \*args) / loop.remove_writer(fd)
 >Start monitoring the fd file descriptor for write availability and invoke callback with the specified arguments once fd is available for writing.)
 
 监听或取消对文件描述符, 如果文件描述符可写入,则执行callback;
+```python
+import asyncio
+from socket import socketpair
 
-##### 2.4.5 异步socket
+# Create a pair of connected file descriptors
+rsock, wsock = socketpair()
+
+loop = asyncio.get_event_loop()
+
+def reader():
+    data = rsock.recv(100)
+    print("Received:", data.decode())
+
+    # We are done: unregister the file descriptor
+    loop.remove_reader(rsock)
+
+    # Stop the event loop
+    loop.stop()
+
+# Register the file descriptor for read event
+loop.add_reader(rsock, reader)
+
+# Simulate the reception of data from the network
+loop.call_soon(wsock.send, 'abc'.encode())
+
+try:
+    # Run the event loop
+    loop.run_forever()
+finally:
+    # We are done. Close sockets and the event loop.
+    rsock.close()
+    wsock.close()
+    loop.close()
+```
+##### 2.4.7 异步socket
 (1)loop.sock_recv(sock, nbytes)
 >Receive up to nbytes from sock. Asynchronous version of socket.recv().
 
@@ -198,7 +278,7 @@ Asynchronous version of socket.connect().
 >Send a file using high-performance os.sendfile if possible. Return the total number of bytes sent.
 Asynchronous version of socket.sendfile().)
 
-##### 2.4.6 在线程或进程池中执行代码
+##### 2.4.8 在线程或进程池中执行代码
 (1)loop.run_in_executor(executor, func, \*args)
 >Arrange for func to be called in the specified executor.
 The executor argument should be an concurrent.futures.Executor instance. The default executor is used if executor is None.
@@ -237,7 +317,7 @@ async def main():
 
 asyncio.run(main())
 ```
-##### 2.4.7 执行命令行指令
+##### 2.4.9 执行命令行指令
 (1)loop.subprocess_exec(protocol_factory, \*args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, \**kwargs)<br>
 >Create a subprocess from one or more string arguments specified by args.
 This is similar to the standard library subprocess.Popen class called with shell=False; Returns a pair of (transport, protocol)
@@ -246,12 +326,72 @@ This is similar to the standard library subprocess.Popen class called with shell
 >Create a subprocess from cmd; This is similar to the standard library subprocess.Popen class called with shell=True.
 
 #### 2.5 Handle/TimeHandle对象
-由loop.call_soon(), loop.call_soon_threadsafe()返回, 可用于取消callback:<br>
+由loop.call_soon(), loop.call_soon_threadsafe()返回, 可用于取消callback（3.7新增）:<br>
 (1) cancel()
 >Cancel the callback. If the callback has already been canceled or executed, this method has no effect.
 
 (2) cancelled()
 >Return True if the callback was cancelled.
+
+#### 2.6 server对象
+由loop.create_server(), loop.create_unix_server()等方法返回，可对创建的server进行一些控制；
+(1)start_serving()<br>
+>Start accepting connections.
+This method is idempotent, so it can be called when the server is already being serving
+
+开始接受连接， 主要在loop.create_server()和asyncio.start_server()的start_serving参数设为false时使用；
+
+(2)serve_forever()
+>Start accepting connections until the coroutine is cancelled. Cancellation of serve_forever task causes the server to be closed.
+
+开始接受连接，直到协程被取消；
+```python
+async def client_connected(reader, writer):
+    # Communicate with the client with
+    # reader/writer streams.  For example:
+    await reader.readline()
+
+async def main(host, port):
+    srv = await asyncio.start_server(
+        client_connected, host, port)
+    await srv.serve_forever()
+
+asyncio.run(main('127.0.0.1', 0))
+```
+(3) wait_closed()
+>Wait until the close() method completes.
+
+异步等待server关闭；
+#### 2.7 transport和protocol
+>At the highest level, the transport is concerned with how bytes are transmitted, while the protocol determines which bytes to transmit (and to some extent when).
+
+>A different way of saying the same thing: a transport is an abstraction for a socket (or similar I/O endpoint) while a protocol is an abstraction for an application, from the transport’s point of view.
+
+>the protocol calls transport methods to send data, while the transport calls protocol methods to pass it data that has been received.
+
+transport决定数据如何传输(socket)， protocol决定传输什么数据以及何时传递(application)；transport和protocol成对使用，protocol调用transport的方法来发送数据，transport调用protocol的方法来将接受到的数据传递给protocol;
+##### 2.7.1 transport
+(1)close() / is_closing() / abort()<br>
+close()关闭transport，然后调用protocol.connection_lost()；如果有数据正在传输，等待传输完成;
+abort()立即关闭transport， 正在传输的数据会丢失；
+
+(2)set_protocol(protocol) / get_protocol()
+设置或获取protocol；
+
+(3)pause_reading() / resume_reading()<br>
+暂停接收数据/恢复接受数据， 用于控制数据接收； 数据接收完成会调用 protocol.data_received()
+
+(4)can_write_eof() / write_eof()
+是否有can_write_eof()方法/在发送完所有数据后关闭transport的输入流；
+
+(5)set_write_buffer_limits(high=None, low=None) / get_write_buffer_limits()
+>Set the high and low watermarks for write flow control.
+
+>These two values (measured in number of bytes) control when the protocol’s protocol.pause_writing() and protocol.resume_writing() methods are called. If specified, the low watermark must be less than or equal to the high watermark. Neither high nor low can be negative.
+
+>pause_writing() is called when the buffer size becomes greater than or equal to the high value. If writing has been paused, resume_writing() is called when the buffer size becomes less than or equal to the low value.
+
+设置写入数据的缓冲区大小；
 #### 2.5 api
 (1)asyncio.run(coro, \*, debug=False)
 > This function runs the passed coroutine, taking care of managing the asyncio event loop and finalizing asynchronous generators.

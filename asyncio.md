@@ -149,15 +149,109 @@ loop.call_at(when, callback, \*args, context=None)<br>
 (7)loop.create_future() / loop.create_task(coro)
 创建future/task对象；
 
-(8)loop.create_connection(protocol_factory, host=None, port=None, \*, ssl=None, family=0, proto=0, flags=0, sock=None, local_addr=None, server_hostname=None, ssl_handshake_timeout=None)
+(8)loop.create_connection(protocol_factory, host=None, port=None, \*, ssl=None, family=0, proto=0, flags=0, sock=None, local_addr=None, server_hostname=None, ssl_handshake_timeout=None)<br>
 以给定参数建立一个tcp连接，返回（transport, protocol)的元组；
 
-(9)loop.create_datagram_endpoint(protocol_factory, local_addr=None, remote_addr=None, \*, family=0, proto=0, flags=0, reuse_address=None, reuse_port=None, allow_broadcast=None, sock=None)
+(9)loop.create_datagram_endpoint(protocol_factory, local_addr=None, remote_addr=None, \*, family=0, proto=0, flags=0, reuse_address=None, reuse_port=None, allow_broadcast=None, sock=None)<br>
 返回（transport, protocol)的元组,用于udp通信；
 
-(10)loop.create_unix_connection(protocol_factory, path=None, \*, ssl=None, sock=None, server_hostname=None, ssl_handshake_timeout=None)
+(10)loop.create_unix_connection(protocol_factory, path=None, \*, ssl=None, sock=None, server_hostname=None, ssl_handshake_timeout=None)<br>
 创建基于Unix文件的连接，返回（transport, protocol)的元组；
 
+(11)loop.create_server(protocol_factory, host=None, port=None, \*, family=socket.AF_UNSPEC, flags=socket.AI_PASSIVE, sock=None, backlog=100, ssl=None, reuse_address=None, reuse_port=None, ssl_handshake_timeout=None, start_serving=True)<br>
+创建tcp server监听对应的端口, 返回一个server对象;
+
+(12)loop.create_unix_server(protocol_factory, path=None, \*, sock=None, backlog=100, ssl=None, ssl_handshake_timeout=None, start_serving=True))<br>
+按对应的文件创建一个unix server, 返回一个server对象;
+
+(13)loop.connect_accepted_socket(protocol_factory, sock, \*, ssl=None, ssl_handshake_timeout=None)<br>
+将一个已经连接的socket对象封装为asyncio可处理的transport, protocol对象;
+
+(14)loop.sendfile(transport, file, offset=0, count=None, \*, fallback=True)<br>
+方法内部使用os.sendfile()发送文件;
+
+(15)loop.add_reader(fd, callback, \*args) / loop.remove_reader(fd)
+>Start monitoring the fd file descriptor for read availability and invoke callback with the specified arguments once fd is available for reading.)
+
+监听或取消对文件描述符, 如果文件描述符可读,则执行callback;
+
+(16loop.add_writer(fd, callback, \*args) / loop.remove_writer(fd)
+>Start monitoring the fd file descriptor for write availability and invoke callback with the specified arguments once fd is available for writing.)
+
+监听或取消对文件描述符, 如果文件描述符可写入,则执行callback;
+
+##### 2.4.5 异步socket
+(1)loop.sock_recv(sock, nbytes)
+>Receive up to nbytes from sock. Asynchronous version of socket.recv().
+
+(2)loop.sock_sendall(sock, data)
+>Send data to the sock socket. Asynchronous version of socket.sendall().
+
+(3)loop.sock_connect(sock, address)
+>Connect sock to a remote socket at address.
+Asynchronous version of socket.connect().
+
+(4)loop.sock_accept(sock)
+>Accept a connection. Modeled after the blocking socket.accept() method.
+
+(5)loop.sock_sendfile(sock, file, offset=0, count=None, \*, fallback=True)
+>Send a file using high-performance os.sendfile if possible. Return the total number of bytes sent.
+Asynchronous version of socket.sendfile().)
+
+##### 2.4.6 在线程或进程池中执行代码
+(1)loop.run_in_executor(executor, func, \*args)
+>Arrange for func to be called in the specified executor.
+The executor argument should be an concurrent.futures.Executor instance. The default executor is used if executor is None.
+
+```python
+import asyncio
+import concurrent.futures
+
+def blocking_io():
+    with open('/dev/urandom', 'rb') as f:
+        return f.read(100)
+
+def cpu_bound():
+    return sum(i * i for i in range(10 ** 7))
+
+async def main():
+    loop = asyncio.get_running_loop()
+
+    ## Options:
+    # 1. Run in the default loop's executor:
+    result = await loop.run_in_executor(
+        None, blocking_io)
+    print('default thread pool', result)
+
+    # 2. Run in a custom thread pool:
+    with concurrent.futures.ThreadPoolExecutor() as pool:
+        result = await loop.run_in_executor(
+            pool, blocking_io)
+        print('custom thread pool', result)
+
+    # 3. Run in a custom process pool:
+    with concurrent.futures.ProcessPoolExecutor() as pool:
+        result = await loop.run_in_executor(
+            pool, cpu_bound)
+        print('custom process pool', result)
+
+asyncio.run(main())
+```
+##### 2.4.7 执行命令行指令
+(1)loop.subprocess_exec(protocol_factory, \*args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, \**kwargs)<br>
+>Create a subprocess from one or more string arguments specified by args.
+This is similar to the standard library subprocess.Popen class called with shell=False; Returns a pair of (transport, protocol)
+
+(2) loop.subprocess_shell(protocol_factory, cmd, \*, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, \**kwargs)
+>Create a subprocess from cmd; This is similar to the standard library subprocess.Popen class called with shell=True.
+
+#### 2.5 Handle/TimeHandle对象
+由loop.call_soon(), loop.call_soon_threadsafe()返回, 可用于取消callback:<br>
+(1) cancel()
+>Cancel the callback. If the callback has already been canceled or executed, this method has no effect.
+
+(2) cancelled()
+>Return True if the callback was cancelled.
 #### 2.5 api
 (1)asyncio.run(coro, \*, debug=False)
 > This function runs the passed coroutine, taking care of managing the asyncio event loop and finalizing asynchronous generators.

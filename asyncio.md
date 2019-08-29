@@ -1,5 +1,40 @@
+<!-- TOC -->
+
+- [1.介绍](#1%E4%BB%8B%E7%BB%8D)
+- [2.使用示例](#2%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B)
+  - [2.2 异步网络通信](#22-%E5%BC%82%E6%AD%A5%E7%BD%91%E7%BB%9C%E9%80%9A%E4%BF%A1)
+  - [2.3 异步执行命令行指令](#23-%E5%BC%82%E6%AD%A5%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4%E8%A1%8C%E6%8C%87%E4%BB%A4)
+  - [2.4 异步操作队列](#24-%E5%BC%82%E6%AD%A5%E6%93%8D%E4%BD%9C%E9%98%9F%E5%88%97)
+- [3.概念](#3%E6%A6%82%E5%BF%B5)
+  - [3.1 awaitable](#31-awaitable)
+  - [3.2 task对象](#32-task%E5%AF%B9%E8%B1%A1)
+  - [3.3 future对象](#33-future%E5%AF%B9%E8%B1%A1)
+  - [3.4 event loop](#34-event-loop)
+    - [3.4.1 添加回调函数](#341-%E6%B7%BB%E5%8A%A0%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0)
+    - [3.4.2 创建future，task对象](#342-%E5%88%9B%E5%BB%BAfuturetask%E5%AF%B9%E8%B1%A1)
+    - [3.4.3 创建网络连接](#343-%E5%88%9B%E5%BB%BA%E7%BD%91%E7%BB%9C%E8%BF%9E%E6%8E%A5)
+    - [3.4.4 创建network server](#344-%E5%88%9B%E5%BB%BAnetwork-server)
+    - [3.4.5 发送文件](#345-%E5%8F%91%E9%80%81%E6%96%87%E4%BB%B6)
+    - [3.4.6 监听文件描述符](#346-%E7%9B%91%E5%90%AC%E6%96%87%E4%BB%B6%E6%8F%8F%E8%BF%B0%E7%AC%A6)
+    - [3.4.7 异步socket](#347-%E5%BC%82%E6%AD%A5socket)
+    - [3.4.8 在线程或进程池中执行代码](#348-%E5%9C%A8%E7%BA%BF%E7%A8%8B%E6%88%96%E8%BF%9B%E7%A8%8B%E6%B1%A0%E4%B8%AD%E6%89%A7%E8%A1%8C%E4%BB%A3%E7%A0%81)
+    - [3.4.9 执行命令行指令](#349-%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4%E8%A1%8C%E6%8C%87%E4%BB%A4)
+  - [3.5 Handle/TimeHandle对象](#35-handletimehandle%E5%AF%B9%E8%B1%A1)
+  - [3.6 server对象](#36-server%E5%AF%B9%E8%B1%A1)
+  - [3.7 transport和protocol](#37-transport%E5%92%8Cprotocol)
+    - [3.7.1 transport](#371-transport)
+    - [3.7.2 protocol](#372-protocol)
+  - [3.8 StreamReader和StreamWriter](#38-streamreader%E5%92%8Cstreamwriter)
+    - [3.8.1 StreamReader](#381-streamreader)
+    - [3.8.2 StreamWriter](#382-streamwriter)
+  - [3.9 Process 对象](#39-process-%E5%AF%B9%E8%B1%A1)
+- [4. api](#4-api)
+- [5 Generator-based Coroutines](#5-generator-based-coroutines)
+
+<!-- /TOC -->
+
 ### 1.介绍
-python3自带的异步编程模块, 主要支持异步的网络IO操作, 子进程管理等功能;
+python3自带的异步编程模块, 主要支持异步的网络IO操作, 异步运行子进程, 异步操作队列等功能;
 ### 2.使用示例
 ```python
 import asyncio
@@ -166,11 +201,6 @@ task是否取消/完成;<br>
 (4) **add_done_callback(callback, *, context=None) / remove_done_callback(callback)**<br>
 添加/移除回调函数, task运行完成后执行;
 
-(5) **get_stack(\*, limit=None) / print_stack(*, limit=None, file=None)** <br>
->Return the list of stack frames for this Task.
-If the wrapped coroutine is not done, this returns the stack where it is suspended. If the coroutine has completed successfully or was cancelled, this returns an empty list. If the coroutine was terminated by an exception, this returns the list of traceback frames.
-
-返回task中协程挂起位置的frame的列表, 如果task已运行结束, 返回空列表;
 #### 3.3 future对象
 >Future objects are used to bridge low-level callback-based code with high-level async/await code.
 

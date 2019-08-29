@@ -1,609 +1,999 @@
-      <!DOCTYPE html>
-      <html>
-        <head>
-            <meta charset="utf-8" />
-            <title>asyncio</title>
-            <style>.markdown-preview:not([data-use-github-style]) { padding: 2em; font-size: 1.2em; color: rgb(56, 58, 66); background-color: rgb(250, 250, 250); overflow: auto; }
-.markdown-preview:not([data-use-github-style]) > :first-child { margin-top: 0px; }
-.markdown-preview:not([data-use-github-style]) h1, .markdown-preview:not([data-use-github-style]) h2, .markdown-preview:not([data-use-github-style]) h3, .markdown-preview:not([data-use-github-style]) h4, .markdown-preview:not([data-use-github-style]) h5, .markdown-preview:not([data-use-github-style]) h6 { line-height: 1.2; margin-top: 1.5em; margin-bottom: 0.5em; color: rgb(0, 0, 0); }
-.markdown-preview:not([data-use-github-style]) h1 { font-size: 2.4em; font-weight: 300; }
-.markdown-preview:not([data-use-github-style]) h2 { font-size: 1.8em; font-weight: 400; }
-.markdown-preview:not([data-use-github-style]) h3 { font-size: 1.5em; font-weight: 500; }
-.markdown-preview:not([data-use-github-style]) h4 { font-size: 1.2em; font-weight: 600; }
-.markdown-preview:not([data-use-github-style]) h5 { font-size: 1.1em; font-weight: 600; }
-.markdown-preview:not([data-use-github-style]) h6 { font-size: 1em; font-weight: 600; }
-.markdown-preview:not([data-use-github-style]) strong { color: rgb(0, 0, 0); }
-.markdown-preview:not([data-use-github-style]) del { color: rgb(94, 97, 110); }
-.markdown-preview:not([data-use-github-style]) a, .markdown-preview:not([data-use-github-style]) a code { color: rgb(82, 111, 255); }
-.markdown-preview:not([data-use-github-style]) img { max-width: 100%; }
-.markdown-preview:not([data-use-github-style]) > p { margin-top: 0px; margin-bottom: 1.5em; }
-.markdown-preview:not([data-use-github-style]) > ul, .markdown-preview:not([data-use-github-style]) > ol { margin-bottom: 1.5em; }
-.markdown-preview:not([data-use-github-style]) blockquote { margin: 1.5em 0px; font-size: inherit; color: rgb(94, 97, 110); border-color: rgb(209, 209, 210); border-width: 4px; }
-.markdown-preview:not([data-use-github-style]) hr { margin: 3em 0px; border-top: 2px dashed rgb(209, 209, 210); background: none; }
-.markdown-preview:not([data-use-github-style]) table { margin: 1.5em 0px; }
-.markdown-preview:not([data-use-github-style]) th { color: rgb(0, 0, 0); }
-.markdown-preview:not([data-use-github-style]) th, .markdown-preview:not([data-use-github-style]) td { padding: 0.66em 1em; border: 1px solid rgb(209, 209, 210); }
-.markdown-preview:not([data-use-github-style]) code { color: rgb(0, 0, 0); background-color: rgb(234, 234, 235); }
-.markdown-preview:not([data-use-github-style]) pre.editor-colors { margin: 1.5em 0px; padding: 1em; font-size: 0.92em; border-radius: 3px; background-color: rgb(240, 240, 240); }
-.markdown-preview:not([data-use-github-style]) kbd { color: rgb(0, 0, 0); border-width: 1px 1px 2px; border-style: solid; border-color: rgb(209, 209, 210) rgb(209, 209, 210) rgb(193, 193, 194); border-image: initial; background-color: rgb(234, 234, 235); }
-.markdown-preview[data-use-github-style] { font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif; line-height: 1.6; word-wrap: break-word; padding: 30px; font-size: 16px; color: rgb(51, 51, 51); background-color: rgb(255, 255, 255); overflow: scroll; }
-.markdown-preview[data-use-github-style] > :first-child { margin-top: 0px !important; }
-.markdown-preview[data-use-github-style] > :last-child { margin-bottom: 0px !important; }
-.markdown-preview[data-use-github-style] a:not([href]) { color: inherit; text-decoration: none; }
-.markdown-preview[data-use-github-style] .absent { color: rgb(204, 0, 0); }
-.markdown-preview[data-use-github-style] .anchor { position: absolute; top: 0px; left: 0px; display: block; padding-right: 6px; padding-left: 30px; margin-left: -30px; }
-.markdown-preview[data-use-github-style] .anchor:focus { outline: none; }
-.markdown-preview[data-use-github-style] h1, .markdown-preview[data-use-github-style] h2, .markdown-preview[data-use-github-style] h3, .markdown-preview[data-use-github-style] h4, .markdown-preview[data-use-github-style] h5, .markdown-preview[data-use-github-style] h6 { position: relative; margin-top: 1em; margin-bottom: 16px; font-weight: bold; line-height: 1.4; }
-.markdown-preview[data-use-github-style] h1 .octicon-link, .markdown-preview[data-use-github-style] h2 .octicon-link, .markdown-preview[data-use-github-style] h3 .octicon-link, .markdown-preview[data-use-github-style] h4 .octicon-link, .markdown-preview[data-use-github-style] h5 .octicon-link, .markdown-preview[data-use-github-style] h6 .octicon-link { display: none; color: rgb(0, 0, 0); vertical-align: middle; }
-.markdown-preview[data-use-github-style] h1:hover .anchor, .markdown-preview[data-use-github-style] h2:hover .anchor, .markdown-preview[data-use-github-style] h3:hover .anchor, .markdown-preview[data-use-github-style] h4:hover .anchor, .markdown-preview[data-use-github-style] h5:hover .anchor, .markdown-preview[data-use-github-style] h6:hover .anchor { padding-left: 8px; margin-left: -30px; text-decoration: none; }
-.markdown-preview[data-use-github-style] h1:hover .anchor .octicon-link, .markdown-preview[data-use-github-style] h2:hover .anchor .octicon-link, .markdown-preview[data-use-github-style] h3:hover .anchor .octicon-link, .markdown-preview[data-use-github-style] h4:hover .anchor .octicon-link, .markdown-preview[data-use-github-style] h5:hover .anchor .octicon-link, .markdown-preview[data-use-github-style] h6:hover .anchor .octicon-link { display: inline-block; }
-.markdown-preview[data-use-github-style] h1 tt, .markdown-preview[data-use-github-style] h2 tt, .markdown-preview[data-use-github-style] h3 tt, .markdown-preview[data-use-github-style] h4 tt, .markdown-preview[data-use-github-style] h5 tt, .markdown-preview[data-use-github-style] h6 tt, .markdown-preview[data-use-github-style] h1 code, .markdown-preview[data-use-github-style] h2 code, .markdown-preview[data-use-github-style] h3 code, .markdown-preview[data-use-github-style] h4 code, .markdown-preview[data-use-github-style] h5 code, .markdown-preview[data-use-github-style] h6 code { font-size: inherit; }
-.markdown-preview[data-use-github-style] h1 { padding-bottom: 0.3em; font-size: 2.25em; line-height: 1.2; border-bottom: 1px solid rgb(238, 238, 238); }
-.markdown-preview[data-use-github-style] h1 .anchor { line-height: 1; }
-.markdown-preview[data-use-github-style] h2 { padding-bottom: 0.3em; font-size: 1.75em; line-height: 1.225; border-bottom: 1px solid rgb(238, 238, 238); }
-.markdown-preview[data-use-github-style] h2 .anchor { line-height: 1; }
-.markdown-preview[data-use-github-style] h3 { font-size: 1.5em; line-height: 1.43; }
-.markdown-preview[data-use-github-style] h3 .anchor { line-height: 1.2; }
-.markdown-preview[data-use-github-style] h4 { font-size: 1.25em; }
-.markdown-preview[data-use-github-style] h4 .anchor { line-height: 1.2; }
-.markdown-preview[data-use-github-style] h5 { font-size: 1em; }
-.markdown-preview[data-use-github-style] h5 .anchor { line-height: 1.1; }
-.markdown-preview[data-use-github-style] h6 { font-size: 1em; color: rgb(119, 119, 119); }
-.markdown-preview[data-use-github-style] h6 .anchor { line-height: 1.1; }
-.markdown-preview[data-use-github-style] p, .markdown-preview[data-use-github-style] blockquote, .markdown-preview[data-use-github-style] ul, .markdown-preview[data-use-github-style] ol, .markdown-preview[data-use-github-style] dl, .markdown-preview[data-use-github-style] table, .markdown-preview[data-use-github-style] pre { margin-top: 0px; margin-bottom: 16px; }
-.markdown-preview[data-use-github-style] hr { height: 4px; padding: 0px; margin: 16px 0px; background-color: rgb(231, 231, 231); border: 0px none; }
-.markdown-preview[data-use-github-style] ul, .markdown-preview[data-use-github-style] ol { padding-left: 2em; }
-.markdown-preview[data-use-github-style] ul.no-list, .markdown-preview[data-use-github-style] ol.no-list { padding: 0px; list-style-type: none; }
-.markdown-preview[data-use-github-style] ul ul, .markdown-preview[data-use-github-style] ul ol, .markdown-preview[data-use-github-style] ol ol, .markdown-preview[data-use-github-style] ol ul { margin-top: 0px; margin-bottom: 0px; }
-.markdown-preview[data-use-github-style] li > p { margin-top: 16px; }
-.markdown-preview[data-use-github-style] dl { padding: 0px; }
-.markdown-preview[data-use-github-style] dl dt { padding: 0px; margin-top: 16px; font-size: 1em; font-style: italic; font-weight: bold; }
-.markdown-preview[data-use-github-style] dl dd { padding: 0px 16px; margin-bottom: 16px; }
-.markdown-preview[data-use-github-style] blockquote { padding: 0px 15px; color: rgb(119, 119, 119); border-left: 4px solid rgb(221, 221, 221); }
-.markdown-preview[data-use-github-style] blockquote > :first-child { margin-top: 0px; }
-.markdown-preview[data-use-github-style] blockquote > :last-child { margin-bottom: 0px; }
-.markdown-preview[data-use-github-style] table { display: block; width: 100%; overflow: auto; word-break: keep-all; }
-.markdown-preview[data-use-github-style] table th { font-weight: bold; }
-.markdown-preview[data-use-github-style] table th, .markdown-preview[data-use-github-style] table td { padding: 6px 13px; border: 1px solid rgb(221, 221, 221); }
-.markdown-preview[data-use-github-style] table tr { background-color: rgb(255, 255, 255); border-top: 1px solid rgb(204, 204, 204); }
-.markdown-preview[data-use-github-style] table tr:nth-child(2n) { background-color: rgb(248, 248, 248); }
-.markdown-preview[data-use-github-style] img { max-width: 100%; box-sizing: border-box; }
-.markdown-preview[data-use-github-style] .emoji { max-width: none; }
-.markdown-preview[data-use-github-style] span.frame { display: block; overflow: hidden; }
-.markdown-preview[data-use-github-style] span.frame > span { display: block; float: left; width: auto; padding: 7px; margin: 13px 0px 0px; overflow: hidden; border: 1px solid rgb(221, 221, 221); }
-.markdown-preview[data-use-github-style] span.frame span img { display: block; float: left; }
-.markdown-preview[data-use-github-style] span.frame span span { display: block; padding: 5px 0px 0px; clear: both; color: rgb(51, 51, 51); }
-.markdown-preview[data-use-github-style] span.align-center { display: block; overflow: hidden; clear: both; }
-.markdown-preview[data-use-github-style] span.align-center > span { display: block; margin: 13px auto 0px; overflow: hidden; text-align: center; }
-.markdown-preview[data-use-github-style] span.align-center span img { margin: 0px auto; text-align: center; }
-.markdown-preview[data-use-github-style] span.align-right { display: block; overflow: hidden; clear: both; }
-.markdown-preview[data-use-github-style] span.align-right > span { display: block; margin: 13px 0px 0px; overflow: hidden; text-align: right; }
-.markdown-preview[data-use-github-style] span.align-right span img { margin: 0px; text-align: right; }
-.markdown-preview[data-use-github-style] span.float-left { display: block; float: left; margin-right: 13px; overflow: hidden; }
-.markdown-preview[data-use-github-style] span.float-left span { margin: 13px 0px 0px; }
-.markdown-preview[data-use-github-style] span.float-right { display: block; float: right; margin-left: 13px; overflow: hidden; }
-.markdown-preview[data-use-github-style] span.float-right > span { display: block; margin: 13px auto 0px; overflow: hidden; text-align: right; }
-.markdown-preview[data-use-github-style] code, .markdown-preview[data-use-github-style] tt { padding: 0.2em 0px; margin: 0px; font-size: 85%; background-color: rgba(0, 0, 0, 0.04); border-radius: 3px; }
-.markdown-preview[data-use-github-style] code::before, .markdown-preview[data-use-github-style] tt::before, .markdown-preview[data-use-github-style] code::after, .markdown-preview[data-use-github-style] tt::after { letter-spacing: -0.2em; content: " "; }
-.markdown-preview[data-use-github-style] code br, .markdown-preview[data-use-github-style] tt br { display: none; }
-.markdown-preview[data-use-github-style] del code { text-decoration: inherit; }
-.markdown-preview[data-use-github-style] pre > code { padding: 0px; margin: 0px; font-size: 100%; word-break: normal; white-space: pre; background: transparent; border: 0px; }
-.markdown-preview[data-use-github-style] .highlight { margin-bottom: 16px; }
-.markdown-preview[data-use-github-style] .highlight pre, .markdown-preview[data-use-github-style] pre { padding: 16px; overflow: auto; font-size: 85%; line-height: 1.45; background-color: rgb(247, 247, 247); border-radius: 3px; }
-.markdown-preview[data-use-github-style] .highlight pre { margin-bottom: 0px; word-break: normal; }
-.markdown-preview[data-use-github-style] pre { word-wrap: normal; }
-.markdown-preview[data-use-github-style] pre code, .markdown-preview[data-use-github-style] pre tt { display: inline; max-width: initial; padding: 0px; margin: 0px; overflow: initial; line-height: inherit; word-wrap: normal; background-color: transparent; border: 0px; }
-.markdown-preview[data-use-github-style] pre code::before, .markdown-preview[data-use-github-style] pre tt::before, .markdown-preview[data-use-github-style] pre code::after, .markdown-preview[data-use-github-style] pre tt::after { content: normal; }
-.markdown-preview[data-use-github-style] kbd { display: inline-block; padding: 3px 5px; font-size: 11px; line-height: 10px; color: rgb(85, 85, 85); vertical-align: middle; background-color: rgb(252, 252, 252); border-width: 1px; border-style: solid; border-color: rgb(204, 204, 204) rgb(204, 204, 204) rgb(187, 187, 187); border-image: initial; border-radius: 3px; box-shadow: rgb(187, 187, 187) 0px -1px 0px inset; }
-.markdown-preview[data-use-github-style] a { color: rgb(51, 122, 183); }
-.markdown-preview[data-use-github-style] code { color: inherit; }
-.markdown-preview[data-use-github-style] pre.editor-colors { padding: 0.8em 1em; margin-bottom: 1em; font-size: 0.85em; border-radius: 4px; overflow: auto; }
-.markdown-preview pre.editor-colors { user-select: auto; }
-.scrollbars-visible-always .markdown-preview pre.editor-colors .vertical-scrollbar, .scrollbars-visible-always .markdown-preview pre.editor-colors .horizontal-scrollbar { visibility: hidden; }
-.scrollbars-visible-always .markdown-preview pre.editor-colors:hover .vertical-scrollbar, .scrollbars-visible-always .markdown-preview pre.editor-colors:hover .horizontal-scrollbar { visibility: visible; }
-.markdown-preview .task-list-item input[type="checkbox"] { position: absolute; margin: 0.25em 0px 0px -1.4em; }
-.markdown-preview .task-list-item { list-style-type: none; }
-.bracket-matcher .region {
-  border-bottom: 1px dotted lime;
-  position: absolute;
+<!DOCTYPE html>
+<html data-markdown-preview-plus-context="html-export">
+  <head>
+    <meta charset="utf-8" />
+    <title>asyncio</title>
+    <style>.emoji {
+  max-width: 1em !important;
 }
-.line-number.bracket-matcher.bracket-matcher {
-  color: #383a42;
-  background-color: #e5e5e6;
+del {
+  text-decoration: none;
+  position: relative;
+}
+del::after {
+  border-bottom: 1px solid black;
+  content: '';
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 50%;
+}
+ul.contains-task-list li.task-list-item {
+  position: relative;
+  list-style-type: none;
+}
+ul.contains-task-list li.task-list-item input.task-list-item-checkbox {
+  position: absolute;
+  transform: translateX(-100%);
+  width: 30px;
+}
+span.critic.comment {
+  position: relative;
+}
+span.critic.comment::before {
+  content: '\1f4ac';
+  position: initial;
+}
+span.critic.comment > span {
+  display: none;
+}
+span.critic.comment:hover > span {
+  display: initial;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  border: 1px solid;
+  border-radius: 5px;
+  max-height: 4em;
+  overflow: auto;
+}
+span.critic.comment:focus > span {
+  display: initial;
+  text-decoration: underline;
+  position: initial;
+  top: auto;
+  left: auto;
+  border: initial;
+  border-radius: initial;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  background-color: transparent;
 }
 
-.spell-check-misspelling .region {
-  border-bottom: 2px dotted rgba(255, 51, 51, 0.75);
+body {
+  padding: 2em;
+  font-size: 1.2em;
+  color: #383a42;
+  background-color: #fafafa;
+  overflow: auto;
 }
-.spell-check-corrections {
-  width: 25em !important;
+body > :first-child,
+body > div.update-preview > :first-child {
+  margin-top: 0;
+}
+body > p,
+body > div.update-preview > p {
+  margin-top: 0;
+  margin-bottom: 1.5em;
+}
+body > ul,
+body > div.update-preview > ul,
+body > ol,
+body > div.update-preview > ol {
+  margin-bottom: 1.5em;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  line-height: 1.2;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  color: #000000;
+}
+h1 {
+  font-size: 2.4em;
+  font-weight: 300;
+}
+h2 {
+  font-size: 1.8em;
+  font-weight: 400;
+}
+h3 {
+  font-size: 1.5em;
+  font-weight: 500;
+}
+h4 {
+  font-size: 1.2em;
+  font-weight: 600;
+}
+h5 {
+  font-size: 1.1em;
+  font-weight: 600;
+}
+h6 {
+  font-size: 1em;
+  font-weight: 600;
+}
+strong {
+  color: #000000;
+}
+del {
+  color: #5e616e;
+}
+a,
+a code {
+  color: #526fff;
+}
+img {
+  max-width: 100%;
+}
+blockquote {
+  margin: 1.5em 0;
+  font-size: inherit;
+  color: #5e616e;
+  border-color: #d1d1d2;
+  border-width: 4px;
+}
+hr {
+  margin: 3em 0;
+  border-top: 2px dashed #d1d1d2;
+  background: none;
+}
+table {
+  margin: 1.5em 0;
+}
+th {
+  color: #000000;
+}
+th,
+td {
+  padding: 0.66em 1em;
+  border: 1px solid #d1d1d2;
+}
+code {
+  color: #000000;
+  background-color: #eaeaeb;
+}
+pre.editor-colors {
+  margin: 1.5em 0;
+  padding: 1em;
+  font-size: 0.92em;
+  border-radius: 3px;
+  background-color: #f0f0f0;
+}
+kbd {
+  color: #000000;
+  border: 1px solid #d1d1d2;
+  border-bottom: 2px solid #c1c1c2;
+  background-color: #eaeaeb;
 }
 
 pre.editor-colors {
-  background-color: #fafafa;
-  color: #383a42;
-}
-pre.editor-colors .line.cursor-line {
-  background-color: rgba(56, 58, 66, 0.05);
-}
-pre.editor-colors .invisible {
-  color: #383a42;
-}
-pre.editor-colors .cursor {
-  border-left: 2px solid #526fff;
-}
-pre.editor-colors .selection .region {
-  background-color: #e5e5e6;
-}
-pre.editor-colors .bracket-matcher .region {
-  border-bottom: 1px solid #526fff;
-  box-sizing: border-box;
+  background-color: white;
+  color: #555;
 }
 pre.editor-colors .invisible-character {
-  color: rgba(56, 58, 66, 0.2);
+  color: rgba(85, 85, 85, 0.2);
 }
 pre.editor-colors .indent-guide {
-  color: rgba(56, 58, 66, 0.2);
+  color: rgba(85, 85, 85, 0.2);
 }
 pre.editor-colors .wrap-guide {
-  background-color: rgba(56, 58, 66, 0.2);
+  background-color: rgba(85, 85, 85, 0.2);
 }
-pre.editor-colors .find-result .region.region.region,
-pre.editor-colors .current-result .region.region.region {
-  border-radius: 2px;
-  background-color: rgba(82, 111, 255, 0.2);
-  transition: border-color 0.4s;
-}
-pre.editor-colors .find-result .region.region.region {
-  border: 2px solid transparent;
-}
-pre.editor-colors .current-result .region.region.region {
-  border: 2px solid #526fff;
-  transition-duration: .1s;
-}
-pre.editor-colors .gutter .line-number {
-  color: #9d9d9f;
-  -webkit-font-smoothing: antialiased;
-}
-pre.editor-colors .gutter .line-number.cursor-line {
-  color: #383a42;
-  background-color: #e5e5e6;
-}
-pre.editor-colors .gutter .line-number.cursor-line-no-selection {
-  background-color: transparent;
-}
-pre.editor-colors .gutter .line-number .icon-right {
-  color: #383a42;
-}
-pre.editor-colors .gutter:not(.git-diff-icon) .line-number.git-line-removed.git-line-removed::before {
-  bottom: -3px;
-}
-pre.editor-colors .gutter:not(.git-diff-icon) .line-number.git-line-removed::after {
-  content: "";
-  position: absolute;
-  left: 0px;
-  bottom: 0px;
-  width: 25px;
-  border-bottom: 1px dotted rgba(255, 20, 20, 0.5);
-  pointer-events: none;
+pre.editor-colors .gutter {
+  color: #555;
+  background: white;
 }
 pre.editor-colors .gutter .line-number.folded,
 pre.editor-colors .gutter .line-number:after,
 pre.editor-colors .fold-marker:after {
-  color: #383a42;
+  color: #e87b00;
+}
+pre.editor-colors .invisible {
+  color: #555;
+}
+pre.editor-colors .selection .region {
+  background-color: #e1e1e1;
+}
+pre.editor-colors .bracket-matcher .region {
+  background-color: #C9C9C9;
+  opacity: .7;
+  border-bottom: 0 none;
+}
+pre.editor-colors.is-focused .cursor {
+  border-color: black;
+}
+pre.editor-colors.is-focused .selection .region {
+  background-color: #afc4da;
+}
+pre.editor-colors.is-focused .line-number.cursor-line-no-selection,
+pre.editor-colors.is-focused .line.cursor-line {
+  background-color: rgba(255, 255, 134, 0.34);
 }
 .syntax--comment {
-  color: #a0a1a7;
+  color: #999988;
   font-style: italic;
-}
-.syntax--comment .syntax--markup.syntax--link {
-  color: #a0a1a7;
-}
-.syntax--entity.syntax--name.syntax--type {
-  color: #c18401;
-}
-.syntax--entity.syntax--other.syntax--inherited-class {
-  color: #50a14f;
-}
-.syntax--keyword {
-  color: #a626a4;
-}
-.syntax--keyword.syntax--control {
-  color: #a626a4;
-}
-.syntax--keyword.syntax--operator {
-  color: #383a42;
-}
-.syntax--keyword.syntax--other.syntax--special-method {
-  color: #4078f2;
-}
-.syntax--keyword.syntax--other.syntax--unit {
-  color: #986801;
-}
-.syntax--storage {
-  color: #a626a4;
-}
-.syntax--storage.syntax--type.syntax--annotation,
-.syntax--storage.syntax--type.syntax--primitive {
-  color: #a626a4;
-}
-.syntax--storage.syntax--modifier.syntax--package,
-.syntax--storage.syntax--modifier.syntax--import {
-  color: #383a42;
-}
-.syntax--constant {
-  color: #986801;
-}
-.syntax--constant.syntax--variable {
-  color: #986801;
-}
-.syntax--constant.syntax--character.syntax--escape {
-  color: #0184bc;
-}
-.syntax--constant.syntax--numeric {
-  color: #986801;
-}
-.syntax--constant.syntax--other.syntax--color {
-  color: #0184bc;
-}
-.syntax--constant.syntax--other.syntax--symbol {
-  color: #0184bc;
-}
-.syntax--variable {
-  color: #e45649;
-}
-.syntax--variable.syntax--interpolation {
-  color: #ca1243;
-}
-.syntax--variable.syntax--parameter {
-  color: #383a42;
 }
 .syntax--string {
-  color: #50a14f;
+  color: #D14;
 }
-.syntax--string > .syntax--source,
-.syntax--string .syntax--embedded {
-  color: #383a42;
+.syntax--string .syntax--source,
+.syntax--string .syntax--meta.syntax--embedded.syntax--line {
+  color: #5A5A5A;
 }
-.syntax--string.syntax--regexp {
-  color: #0184bc;
+.syntax--string .syntax--punctuation.syntax--section.syntax--embedded {
+  color: #920B2D;
 }
-.syntax--string.syntax--regexp .syntax--source.syntax--ruby.syntax--embedded {
-  color: #c18401;
+.syntax--string .syntax--punctuation.syntax--section.syntax--embedded .syntax--source {
+  color: #920B2D;
 }
-.syntax--string.syntax--other.syntax--link {
-  color: #e45649;
+.syntax--constant.syntax--numeric {
+  color: #D14;
 }
-.syntax--punctuation.syntax--definition.syntax--comment {
-  color: #a0a1a7;
+.syntax--constant.syntax--language {
+  color: #606aa1;
 }
-.syntax--punctuation.syntax--definition.syntax--method-parameters,
-.syntax--punctuation.syntax--definition.syntax--function-parameters,
-.syntax--punctuation.syntax--definition.syntax--parameters,
-.syntax--punctuation.syntax--definition.syntax--separator,
-.syntax--punctuation.syntax--definition.syntax--seperator,
-.syntax--punctuation.syntax--definition.syntax--array {
-  color: #383a42;
+.syntax--constant.syntax--character,
+.syntax--constant.syntax--other {
+  color: #606aa1;
 }
-.syntax--punctuation.syntax--definition.syntax--heading,
-.syntax--punctuation.syntax--definition.syntax--identity {
-  color: #4078f2;
+.syntax--constant.syntax--symbol {
+  color: #990073;
 }
-.syntax--punctuation.syntax--definition.syntax--bold {
-  color: #c18401;
+.syntax--constant.syntax--numeric.syntax--line-number.syntax--find-in-files .syntax--match {
+  color: rgba(143, 190, 0, 0.63);
+}
+.syntax--variable {
+  color: #008080;
+}
+.syntax--variable.syntax--parameter {
+  color: #606aa1;
+}
+.syntax--keyword {
+  color: #222;
   font-weight: bold;
 }
-.syntax--punctuation.syntax--definition.syntax--italic {
-  color: #a626a4;
-  font-style: italic;
+.syntax--keyword.syntax--unit {
+  color: #445588;
 }
-.syntax--punctuation.syntax--section.syntax--embedded {
-  color: #ca1243;
+.syntax--keyword.syntax--special-method {
+  color: #0086B3;
 }
-.syntax--punctuation.syntax--section.syntax--method,
-.syntax--punctuation.syntax--section.syntax--class,
-.syntax--punctuation.syntax--section.syntax--inner-class {
-  color: #383a42;
+.syntax--storage {
+  color: #222;
 }
-.syntax--support.syntax--class {
-  color: #c18401;
+.syntax--storage.syntax--type {
+  color: #222;
 }
-.syntax--support.syntax--type {
-  color: #0184bc;
+.syntax--entity.syntax--name.syntax--class {
+  text-decoration: underline;
+  color: #606aa1;
 }
-.syntax--support.syntax--function {
-  color: #0184bc;
-}
-.syntax--support.syntax--function.syntax--any-method {
-  color: #4078f2;
+.syntax--entity.syntax--other.syntax--inherited-class {
+  text-decoration: underline;
+  color: #606aa1;
 }
 .syntax--entity.syntax--name.syntax--function {
-  color: #4078f2;
-}
-.syntax--entity.syntax--name.syntax--class,
-.syntax--entity.syntax--name.syntax--type.syntax--class {
-  color: #c18401;
-}
-.syntax--entity.syntax--name.syntax--section {
-  color: #4078f2;
+  color: #900;
 }
 .syntax--entity.syntax--name.syntax--tag {
-  color: #e45649;
+  color: #008080;
 }
 .syntax--entity.syntax--other.syntax--attribute-name {
-  color: #986801;
-}
-.syntax--entity.syntax--other.syntax--attribute-name.syntax--id {
-  color: #4078f2;
-}
-.syntax--meta.syntax--class {
-  color: #c18401;
-}
-.syntax--meta.syntax--class.syntax--body {
-  color: #383a42;
-}
-.syntax--meta.syntax--method-call,
-.syntax--meta.syntax--method {
-  color: #383a42;
-}
-.syntax--meta.syntax--definition.syntax--variable {
-  color: #e45649;
-}
-.syntax--meta.syntax--link {
-  color: #986801;
-}
-.syntax--meta.syntax--require {
-  color: #4078f2;
-}
-.syntax--meta.syntax--selector {
-  color: #a626a4;
-}
-.syntax--meta.syntax--separator {
-  color: #383a42;
-}
-.syntax--meta.syntax--tag {
-  color: #383a42;
-}
-.syntax--underline {
-  text-decoration: underline;
-}
-.syntax--none {
-  color: #383a42;
-}
-.syntax--invalid.syntax--deprecated {
-  color: #000000 !important;
-  background-color: #f2a60d !important;
-}
-.syntax--invalid.syntax--illegal {
-  color: white !important;
-  background-color: #ff1414 !important;
-}
-.syntax--markup.syntax--bold {
-  color: #986801;
+  color: #458;
   font-weight: bold;
 }
-.syntax--markup.syntax--changed {
-  color: #a626a4;
+.syntax--entity.syntax--name.syntax--filename.syntax--find-in-files {
+  color: #E6DB74;
 }
-.syntax--markup.syntax--deleted {
-  color: #e45649;
+.syntax--support.syntax--constant,
+.syntax--support.syntax--function,
+.syntax--support.syntax--type {
+  color: #458;
 }
-.syntax--markup.syntax--italic {
-  color: #a626a4;
-  font-style: italic;
+.syntax--support.syntax--class {
+  color: #008080;
 }
-.syntax--markup.syntax--heading {
-  color: #e45649;
+.syntax--invalid {
+  color: #F8F8F0;
+  background-color: #00A8C6;
 }
-.syntax--markup.syntax--heading .syntax--punctuation.syntax--definition.syntax--heading {
-  color: #4078f2;
+.syntax--invalid.syntax--deprecated {
+  color: #F8F8F0;
+  background-color: #8FBE00;
 }
-.syntax--markup.syntax--link {
-  color: #0184bc;
+.syntax--meta.syntax--structure.syntax--dictionary.syntax--json > .syntax--string.syntax--quoted.syntax--double.syntax--json,
+.syntax--meta.syntax--structure.syntax--dictionary.syntax--json > .syntax--string.syntax--quoted.syntax--double.syntax--json .syntax--punctuation.syntax--string {
+  color: #000080;
 }
-.syntax--markup.syntax--inserted {
-  color: #50a14f;
+.syntax--meta.syntax--structure.syntax--dictionary.syntax--value.syntax--json > .syntax--string.syntax--quoted.syntax--double.syntax--json {
+  color: #d14;
 }
-.syntax--markup.syntax--quote {
-  color: #986801;
+.syntax--meta.syntax--diff,
+.syntax--meta.syntax--diff.syntax--header {
+  color: #75715E;
 }
-.syntax--markup.syntax--raw {
-  color: #50a14f;
+.syntax--css.syntax--support.syntax--property-name {
+  font-weight: bold;
+  color: #333;
 }
-.syntax--source.syntax--c .syntax--keyword.syntax--operator {
-  color: #a626a4;
+.syntax--css.syntax--constant {
+  color: #099;
 }
-.syntax--source.syntax--cpp .syntax--keyword.syntax--operator {
-  color: #a626a4;
+.syntax--source.syntax--gfm {
+  color: #444;
 }
-.syntax--source.syntax--cs .syntax--keyword.syntax--operator {
-  color: #a626a4;
+.syntax--gfm .syntax--markup.syntax--heading {
+  color: #111;
 }
-.syntax--source.syntax--css .syntax--property-name,
-.syntax--source.syntax--css .syntax--property-value {
-  color: #696c77;
+.syntax--gfm .syntax--link {
+  color: #888;
 }
-.syntax--source.syntax--css .syntax--property-name.syntax--support,
-.syntax--source.syntax--css .syntax--property-value.syntax--support {
-  color: #383a42;
+.syntax--gfm .syntax--variable.syntax--list {
+  color: #888;
 }
-.syntax--source.syntax--elixir .syntax--source.syntax--embedded.syntax--source {
-  color: #383a42;
+.syntax--markdown .syntax--paragraph {
+  color: #444;
 }
-.syntax--source.syntax--elixir .syntax--constant.syntax--language,
-.syntax--source.syntax--elixir .syntax--constant.syntax--numeric,
-.syntax--source.syntax--elixir .syntax--constant.syntax--definition {
-  color: #4078f2;
+.syntax--markdown .syntax--heading {
+  color: #111;
 }
-.syntax--source.syntax--elixir .syntax--variable.syntax--definition,
-.syntax--source.syntax--elixir .syntax--variable.syntax--anonymous {
-  color: #a626a4;
+.syntax--markdown .syntax--link {
+  color: #888;
 }
-.syntax--source.syntax--elixir .syntax--parameter.syntax--variable.syntax--function {
-  color: #986801;
-  font-style: italic;
+.syntax--markdown .syntax--link .syntax--string {
+  color: #888;
 }
-.syntax--source.syntax--elixir .syntax--quoted {
-  color: #50a14f;
-}
-.syntax--source.syntax--elixir .syntax--keyword.syntax--special-method,
-.syntax--source.syntax--elixir .syntax--embedded.syntax--section,
-.syntax--source.syntax--elixir .syntax--embedded.syntax--source.syntax--empty {
-  color: #e45649;
-}
-.syntax--source.syntax--elixir .syntax--readwrite.syntax--module .syntax--punctuation {
-  color: #e45649;
-}
-.syntax--source.syntax--elixir .syntax--regexp.syntax--section,
-.syntax--source.syntax--elixir .syntax--regexp.syntax--string {
-  color: #ca1243;
-}
-.syntax--source.syntax--elixir .syntax--separator,
-.syntax--source.syntax--elixir .syntax--keyword.syntax--operator {
-  color: #986801;
-}
-.syntax--source.syntax--elixir .syntax--variable.syntax--constant {
-  color: #c18401;
-}
-.syntax--source.syntax--elixir .syntax--array,
-.syntax--source.syntax--elixir .syntax--scope,
-.syntax--source.syntax--elixir .syntax--section {
-  color: #696c77;
-}
-.syntax--source.syntax--gfm .syntax--markup {
-  -webkit-font-smoothing: auto;
-}
-.syntax--source.syntax--gfm .syntax--link .syntax--entity {
-  color: #4078f2;
-}
-.syntax--source.syntax--go .syntax--storage.syntax--type.syntax--string {
-  color: #a626a4;
-}
-.syntax--source.syntax--ini .syntax--keyword.syntax--other.syntax--definition.syntax--ini {
-  color: #e45649;
-}
-.syntax--source.syntax--java .syntax--storage.syntax--modifier.syntax--import {
-  color: #c18401;
-}
-.syntax--source.syntax--java .syntax--storage.syntax--type {
-  color: #c18401;
-}
-.syntax--source.syntax--java .syntax--keyword.syntax--operator.syntax--instanceof {
-  color: #a626a4;
-}
-.syntax--source.syntax--java-properties .syntax--meta.syntax--key-pair {
-  color: #e45649;
-}
-.syntax--source.syntax--java-properties .syntax--meta.syntax--key-pair > .syntax--punctuation {
-  color: #383a42;
-}
-.syntax--source.syntax--js .syntax--keyword.syntax--operator {
-  color: #0184bc;
-}
-.syntax--source.syntax--js .syntax--keyword.syntax--operator.syntax--delete,
-.syntax--source.syntax--js .syntax--keyword.syntax--operator.syntax--in,
-.syntax--source.syntax--js .syntax--keyword.syntax--operator.syntax--of,
-.syntax--source.syntax--js .syntax--keyword.syntax--operator.syntax--instanceof,
-.syntax--source.syntax--js .syntax--keyword.syntax--operator.syntax--new,
-.syntax--source.syntax--js .syntax--keyword.syntax--operator.syntax--typeof,
-.syntax--source.syntax--js .syntax--keyword.syntax--operator.syntax--void {
-  color: #a626a4;
-}
-.syntax--source.syntax--ts .syntax--keyword.syntax--operator {
-  color: #0184bc;
-}
-.syntax--source.syntax--flow .syntax--keyword.syntax--operator {
-  color: #0184bc;
-}
-.syntax--source.syntax--json .syntax--meta.syntax--structure.syntax--dictionary.syntax--json > .syntax--string.syntax--quoted.syntax--json {
-  color: #e45649;
-}
-.syntax--source.syntax--json .syntax--meta.syntax--structure.syntax--dictionary.syntax--json > .syntax--string.syntax--quoted.syntax--json > .syntax--punctuation.syntax--string {
-  color: #e45649;
-}
-.syntax--source.syntax--json .syntax--meta.syntax--structure.syntax--dictionary.syntax--json > .syntax--value.syntax--json > .syntax--string.syntax--quoted.syntax--json,
-.syntax--source.syntax--json .syntax--meta.syntax--structure.syntax--array.syntax--json > .syntax--value.syntax--json > .syntax--string.syntax--quoted.syntax--json,
-.syntax--source.syntax--json .syntax--meta.syntax--structure.syntax--dictionary.syntax--json > .syntax--value.syntax--json > .syntax--string.syntax--quoted.syntax--json > .syntax--punctuation,
-.syntax--source.syntax--json .syntax--meta.syntax--structure.syntax--array.syntax--json > .syntax--value.syntax--json > .syntax--string.syntax--quoted.syntax--json > .syntax--punctuation {
-  color: #50a14f;
-}
-.syntax--source.syntax--json .syntax--meta.syntax--structure.syntax--dictionary.syntax--json > .syntax--constant.syntax--language.syntax--json,
-.syntax--source.syntax--json .syntax--meta.syntax--structure.syntax--array.syntax--json > .syntax--constant.syntax--language.syntax--json {
-  color: #0184bc;
-}
-.syntax--ng.syntax--interpolation {
-  color: #e45649;
-}
-.syntax--ng.syntax--interpolation.syntax--begin,
-.syntax--ng.syntax--interpolation.syntax--end {
-  color: #4078f2;
-}
-.syntax--ng.syntax--interpolation .syntax--function {
-  color: #e45649;
-}
-.syntax--ng.syntax--interpolation .syntax--function.syntax--begin,
-.syntax--ng.syntax--interpolation .syntax--function.syntax--end {
-  color: #4078f2;
-}
-.syntax--ng.syntax--interpolation .syntax--bool {
-  color: #986801;
-}
-.syntax--ng.syntax--interpolation .syntax--bracket {
-  color: #383a42;
-}
-.syntax--ng.syntax--pipe,
-.syntax--ng.syntax--operator {
-  color: #383a42;
-}
-.syntax--ng.syntax--tag {
-  color: #0184bc;
-}
-.syntax--ng.syntax--attribute-with-value .syntax--attribute-name {
-  color: #c18401;
-}
-.syntax--ng.syntax--attribute-with-value .syntax--string {
-  color: #a626a4;
-}
-.syntax--ng.syntax--attribute-with-value .syntax--string.syntax--begin,
-.syntax--ng.syntax--attribute-with-value .syntax--string.syntax--end {
-  color: #383a42;
-}
-.syntax--source.syntax--ruby .syntax--constant.syntax--other.syntax--symbol > .syntax--punctuation {
-  color: inherit;
-}
-.syntax--source.syntax--php .syntax--class.syntax--bracket {
-  color: #383a42;
-}
-.syntax--source.syntax--python .syntax--keyword.syntax--operator.syntax--logical.syntax--python {
-  color: #a626a4;
-}
-.syntax--source.syntax--python .syntax--variable.syntax--parameter {
-  color: #986801;
-}
+
+/*
+ * Your Stylesheet
+ *
+ * This stylesheet is loaded when Atom starts up and is reloaded automatically
+ * when it is changed and saved.
+ *
+ * Add your own CSS or Less to fully customize Atom.
+ * If you are unfamiliar with Less, you can read more about it here:
+ * http://lesscss.org
+ */
+/*
+ * Examples
+ * (To see them, uncomment and save)
+ */
 </style>
-        </head>
-        <body class='markdown-preview' data-use-github-style><h3 id="1介绍">1.介绍</h3>
-<p>python3自带的异步编程模块, 主要支持异步的网络IO操作, 子进程管理等功能;</p>
-<h3 id="2使用示例">2.使用示例</h3>
-<pre class="editor-colors lang-python"><div class="line"><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">import</span> asyncio</span></div><div class="line"><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">import</span> time</span></div><div class="line"><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">import</span> sys</span></div><div class="line"><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">import</span> logging</span></div><div class="line"></div><div class="line"><span class="syntax--source syntax--python">logging.<span class="syntax--entity syntax--name syntax--function">basicConfig</span>(<span class="syntax--variable syntax--parameter syntax--function">level</span><span class="syntax--keyword syntax--operator">=</span>logging.<span class="syntax--variable syntax--other syntax--object syntax--property">DEBUG</span>, <span class="syntax--variable syntax--parameter syntax--function">stream</span><span class="syntax--keyword syntax--operator">=</span>sys.<span class="syntax--variable syntax--other syntax--object syntax--property">stdout</span>)</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">async</span> <span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">say_after</span>(<span class="syntax--variable syntax--parameter syntax--function">delay</span>, <span class="syntax--variable syntax--parameter syntax--function">what</span>):</span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--comment syntax--line"># await asyncio.sleep(delay)</span></span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(what)</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">async</span> <span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">main</span>():</span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>task1 <span class="syntax--keyword syntax--operator">=</span> asyncio.<span class="syntax--entity syntax--name syntax--function">create_task</span>(</span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--entity syntax--name syntax--function">say_after</span>(<span class="syntax--constant syntax--numeric">1</span>, <span class="syntax--string syntax--quoted">'hello'</span>))</span></div><div class="line"></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>task2 <span class="syntax--keyword syntax--operator">=</span> asyncio.<span class="syntax--entity syntax--name syntax--function">create_task</span>(</span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--entity syntax--name syntax--function">say_after</span>(<span class="syntax--constant syntax--numeric">2</span>, <span class="syntax--string syntax--quoted">'world'</span>))</span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--comment syntax--line"># time.sleep(1)</span></span></div><div class="line"></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">f"started at <span class="syntax--meta syntax--embedded"><span class="syntax--punctuation syntax--section syntax--embedded">{</span>time.<span class="syntax--entity syntax--name syntax--function">strftime</span>(<span class="syntax--string syntax--quoted">'%X'</span>)<span class="syntax--punctuation syntax--section syntax--embedded">}</span></span>"</span>)</span></div><div class="line"></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">await</span> task1</span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">await</span> task2</span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">f"finished at <span class="syntax--meta syntax--embedded"><span class="syntax--punctuation syntax--section syntax--embedded">{</span>time.<span class="syntax--entity syntax--name syntax--function">strftime</span>(<span class="syntax--string syntax--quoted">'%X'</span>)<span class="syntax--punctuation syntax--section syntax--embedded">}</span></span>"</span>)</span></div><div class="line"></div><div class="line"><span class="syntax--source syntax--python">asyncio.<span class="syntax--entity syntax--name syntax--function">run</span>(<span class="syntax--entity syntax--name syntax--function">main</span>(), <span class="syntax--variable syntax--parameter syntax--function">debug</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--language">True</span>)</span></div></pre>
+
+  </head>
+  <body>
+    <h2>目录</h2>
+<!-- TOC depthFrom:1 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
+<ul>
+<li><a href="#%E7%9B%AE%E5%BD%95">目录</a>
+<ul>
+<li><a href="#1%E4%BB%8B%E7%BB%8D">1.介绍</a></li>
+<li><a href="#2%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B">2.使用示例</a>
+<ul>
+<li><a href="#22-%E5%BC%82%E6%AD%A5%E7%BD%91%E7%BB%9C%E9%80%9A%E4%BF%A1">2.2 异步网络通信</a></li>
+<li><a href="#23-%E5%BC%82%E6%AD%A5%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4%E8%A1%8C%E6%8C%87%E4%BB%A4">2.3 异步执行命令行指令</a></li>
+<li><a href="#24-%E5%BC%82%E6%AD%A5%E6%93%8D%E4%BD%9C%E9%98%9F%E5%88%97">2.4 异步操作队列</a></li>
+</ul>
+</li>
+<li><a href="#3%E6%A6%82%E5%BF%B5">3.概念</a>
+<ul>
+<li><a href="#31-awaitable">3.1 awaitable</a></li>
+<li><a href="#32-task%E5%AF%B9%E8%B1%A1">3.2 task对象</a></li>
+<li><a href="#33-future%E5%AF%B9%E8%B1%A1">3.3 future对象</a></li>
+<li><a href="#34-event-loop">3.4 event loop</a>
+<ul>
+<li><a href="#341-%E6%B7%BB%E5%8A%A0%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0">3.4.1 添加回调函数</a></li>
+<li><a href="#342-%E5%88%9B%E5%BB%BAfuturetask%E5%AF%B9%E8%B1%A1">3.4.2 创建future，task对象</a></li>
+<li><a href="#343-%E5%88%9B%E5%BB%BA%E7%BD%91%E7%BB%9C%E8%BF%9E%E6%8E%A5">3.4.3 创建网络连接</a></li>
+<li><a href="#344-%E5%88%9B%E5%BB%BAnetwork-server">3.4.4 创建network server</a></li>
+<li><a href="#345-%E5%8F%91%E9%80%81%E6%96%87%E4%BB%B6">3.4.5 发送文件</a></li>
+<li><a href="#346-%E7%9B%91%E5%90%AC%E6%96%87%E4%BB%B6%E6%8F%8F%E8%BF%B0%E7%AC%A6">3.4.6 监听文件描述符</a></li>
+<li><a href="#347-%E5%BC%82%E6%AD%A5socket">3.4.7 异步socket</a></li>
+<li><a href="#348-%E5%9C%A8%E7%BA%BF%E7%A8%8B%E6%88%96%E8%BF%9B%E7%A8%8B%E6%B1%A0%E4%B8%AD%E6%89%A7%E8%A1%8C%E4%BB%A3%E7%A0%81">3.4.8 在线程或进程池中执行代码</a></li>
+<li><a href="#349-%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4%E8%A1%8C%E6%8C%87%E4%BB%A4">3.4.9 执行命令行指令</a></li>
+</ul>
+</li>
+<li><a href="#35-handletimehandle%E5%AF%B9%E8%B1%A1">3.5 Handle/TimeHandle对象</a></li>
+<li><a href="#36-server%E5%AF%B9%E8%B1%A1">3.6 server对象</a></li>
+<li><a href="#37-transport%E5%92%8Cprotocol">3.7 transport和protocol</a>
+<ul>
+<li><a href="#371-transport">3.7.1 transport</a></li>
+<li><a href="#372-protocol">3.7.2 protocol</a></li>
+</ul>
+</li>
+<li><a href="#38-streamreader%E5%92%8Cstreamwriter">3.8 StreamReader和StreamWriter</a>
+<ul>
+<li><a href="#381-streamreader">3.8.1 StreamReader</a></li>
+<li><a href="#382-streamwriter">3.8.2 StreamWriter</a></li>
+</ul>
+</li>
+<li><a href="#39-process-%E5%AF%B9%E8%B1%A1">3.9 Process 对象</a></li>
+</ul>
+</li>
+<li><a href="#4-api">4. api</a></li>
+<li><a href="#5-generator-based-coroutines">5 Generator-based Coroutines</a></li>
+</ul>
+</li>
+</ul>
+<!-- /TOC -->
+<h3>1.介绍</h3>
+<p>python3自带的异步编程模块, 主要支持异步的网络IO操作, 子进程等功能;</p>
+<h3>2.使用示例</h3>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">import</span> asyncio</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">import</span> time</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">import</span> sys</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">import</span> logging</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python">logging.<span class="syntax--entity syntax--name syntax--function">basicConfig</span>(<span class="syntax--variable syntax--parameter syntax--function">level</span><span class="syntax--keyword syntax--operator">=</span>logging.<span class="syntax--variable syntax--other syntax--object syntax--property">DEBUG</span>, <span class="syntax--variable syntax--parameter syntax--function">stream</span><span class="syntax--keyword syntax--operator">=</span>sys.<span class="syntax--variable syntax--other syntax--object syntax--property">stdout</span>)</span></span>
+<span class=""></span> 
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">async</span> <span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">say_after</span>(<span class="syntax--variable syntax--parameter syntax--function">delay</span>, <span class="syntax--variable syntax--parameter syntax--function">what</span>):</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">await</span> asyncio.<span class="syntax--entity syntax--name syntax--function">sleep</span>(delay)</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(what)</span></span>
+<span class=""></span> 
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">async</span> <span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">main</span>():</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>task1 <span class="syntax--keyword syntax--operator">=</span> asyncio.<span class="syntax--entity syntax--name syntax--function">create_task</span>(</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--entity syntax--name syntax--function">say_after</span>(<span class="syntax--constant syntax--numeric">1</span>, <span class="syntax--string syntax--quoted">'hello'</span>))  <span class="syntax--comment syntax--line"># 3.6用ensure_future</span></span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>task2 <span class="syntax--keyword syntax--operator">=</span> asyncio.<span class="syntax--entity syntax--name syntax--function">create_task</span>(</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--entity syntax--name syntax--function">say_after</span>(<span class="syntax--constant syntax--numeric">2</span>, <span class="syntax--string syntax--quoted">'world'</span>))</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--comment syntax--line"># time.sleep(1)</span></span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">f"started at <span class="syntax--meta syntax--embedded"><span class="syntax--punctuation syntax--section syntax--embedded">{</span>time.<span class="syntax--entity syntax--name syntax--function">strftime</span>(<span class="syntax--string syntax--quoted">'%X'</span>)<span class="syntax--punctuation syntax--section syntax--embedded">}</span></span>"</span>)</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">await</span> task1</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">await</span> task2</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">f"finished at <span class="syntax--meta syntax--embedded"><span class="syntax--punctuation syntax--section syntax--embedded">{</span>time.<span class="syntax--entity syntax--name syntax--function">strftime</span>(<span class="syntax--string syntax--quoted">'%X'</span>)<span class="syntax--punctuation syntax--section syntax--embedded">}</span></span>"</span>)</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python">asyncio.<span class="syntax--entity syntax--name syntax--function">run</span>(<span class="syntax--entity syntax--name syntax--function">main</span>(), <span class="syntax--variable syntax--parameter syntax--function">debug</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--language">True</span>)  <span class="syntax--comment syntax--line"># 3.7</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--string syntax--quoted">"""</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--string syntax--quoted">loop = asyncio.get_event_loop()</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--string syntax--quoted">loop.run_until_complete(main())</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--string syntax--quoted">loop.close()"""</span></span></span></pre>
 <p>(1)通过async关键字定义协程;<br></p>
 <p>(2)通过asyncio.create_task()来定义异步任务;<br></p>
 <p>(3)通过await关键字来异步等待;<br></p>
 <p>(4)通过asyncio.run()来启动协程;<br></p>
-<h4 id="21-awaitable">2.1 awaitable</h4>
+<h4>2.2 异步网络通信</h4>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line"># client</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">import</span> asyncio</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">async</span> <span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">tcp_echo_client</span>(<span class="syntax--variable syntax--parameter syntax--function">message</span>):</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>reader, writer <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--keyword syntax--control">await</span> asyncio.<span class="syntax--entity syntax--name syntax--function">open_connection</span>(</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--string syntax--quoted">'127.0.0.1'</span>, <span class="syntax--constant syntax--numeric">8888</span>)</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">f'Send: <span class="syntax--meta syntax--embedded"><span class="syntax--punctuation syntax--section syntax--embedded">{</span>message!r<span class="syntax--punctuation syntax--section syntax--embedded">}</span></span>'</span>)</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>writer.<span class="syntax--entity syntax--name syntax--function">write</span>(message.<span class="syntax--entity syntax--name syntax--function">encode</span>())</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>data <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--keyword syntax--control">await</span> reader.<span class="syntax--entity syntax--name syntax--function">read</span>(<span class="syntax--constant syntax--numeric">100</span>)</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">f'Received: <span class="syntax--meta syntax--embedded"><span class="syntax--punctuation syntax--section syntax--embedded">{</span>data.<span class="syntax--entity syntax--name syntax--function">decode</span>()!r<span class="syntax--punctuation syntax--section syntax--embedded">}</span></span>'</span>)</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">'Close the connection'</span>)</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>writer.<span class="syntax--entity syntax--name syntax--function">close</span>()</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python">asyncio.<span class="syntax--entity syntax--name syntax--function">run</span>(<span class="syntax--entity syntax--name syntax--function">tcp_echo_client</span>(<span class="syntax--string syntax--quoted">'Hello World!'</span>))</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line"># server</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">import</span> asyncio</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">async</span> <span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">handle_echo</span>(<span class="syntax--variable syntax--parameter syntax--function">reader</span>, <span class="syntax--variable syntax--parameter syntax--function">writer</span>):</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>data <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--keyword syntax--control">await</span> reader.<span class="syntax--entity syntax--name syntax--function">read</span>(<span class="syntax--constant syntax--numeric">100</span>)</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>message <span class="syntax--keyword syntax--operator">=</span> data.<span class="syntax--entity syntax--name syntax--function">decode</span>()</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>addr <span class="syntax--keyword syntax--operator">=</span> writer.<span class="syntax--entity syntax--name syntax--function">get_extra_info</span>(<span class="syntax--string syntax--quoted">'peername'</span>)</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">f"Received <span class="syntax--meta syntax--embedded"><span class="syntax--punctuation syntax--section syntax--embedded">{</span>message!r<span class="syntax--punctuation syntax--section syntax--embedded">}</span></span> from <span class="syntax--meta syntax--embedded"><span class="syntax--punctuation syntax--section syntax--embedded">{</span>addr!r<span class="syntax--punctuation syntax--section syntax--embedded">}</span></span>"</span>)</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">f"Send: <span class="syntax--meta syntax--embedded"><span class="syntax--punctuation syntax--section syntax--embedded">{</span>message!r<span class="syntax--punctuation syntax--section syntax--embedded">}</span></span>"</span>)</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>writer.<span class="syntax--entity syntax--name syntax--function">write</span>(data)</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">await</span> writer.<span class="syntax--entity syntax--name syntax--function">drain</span>()</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">"Close the connection"</span>)</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>writer.<span class="syntax--entity syntax--name syntax--function">close</span>()</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">async</span> <span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">main</span>():</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>server <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--keyword syntax--control">await</span> asyncio.<span class="syntax--entity syntax--name syntax--function">start_server</span>(</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span>handle_echo, <span class="syntax--string syntax--quoted">'127.0.0.1'</span>, <span class="syntax--constant syntax--numeric">8888</span>)</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>addr <span class="syntax--keyword syntax--operator">=</span> server.<span class="syntax--variable syntax--other syntax--object syntax--property">sockets</span>[<span class="syntax--constant syntax--numeric">0</span>].<span class="syntax--entity syntax--name syntax--function">getsockname</span>()</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">f'Serving on <span class="syntax--meta syntax--embedded"><span class="syntax--punctuation syntax--section syntax--embedded">{</span>addr<span class="syntax--punctuation syntax--section syntax--embedded">}</span></span>'</span>)</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">async</span> <span class="syntax--keyword syntax--control">with</span> server:</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--keyword syntax--control">await</span> server.<span class="syntax--entity syntax--name syntax--function">serve_forever</span>()</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python">asyncio.<span class="syntax--entity syntax--name syntax--function">run</span>(<span class="syntax--entity syntax--name syntax--function">main</span>())</span></span></pre>
+<h4>2.3 异步执行命令行指令</h4>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">import</span> asyncio</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">async</span> <span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">run</span>(<span class="syntax--variable syntax--parameter syntax--function">cmd</span>):</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>proc <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--keyword syntax--control">await</span> asyncio.<span class="syntax--entity syntax--name syntax--function">create_subprocess_shell</span>(</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span>cmd,</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--variable syntax--parameter syntax--function">stdout</span><span class="syntax--keyword syntax--operator">=</span>asyncio.<span class="syntax--variable syntax--other syntax--object syntax--property">subprocess</span>.<span class="syntax--variable syntax--other syntax--object syntax--property">PIPE</span>,</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--variable syntax--parameter syntax--function">stderr</span><span class="syntax--keyword syntax--operator">=</span>asyncio.<span class="syntax--variable syntax--other syntax--object syntax--property">subprocess</span>.<span class="syntax--variable syntax--other syntax--object syntax--property">PIPE</span>)</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>stdout, stderr <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--keyword syntax--control">await</span> proc.<span class="syntax--entity syntax--name syntax--function">communicate</span>()</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">f'[<span class="syntax--meta syntax--embedded"><span class="syntax--punctuation syntax--section syntax--embedded">{</span>cmd!r<span class="syntax--punctuation syntax--section syntax--embedded">}</span></span> exited with <span class="syntax--meta syntax--embedded"><span class="syntax--punctuation syntax--section syntax--embedded">{</span>proc.<span class="syntax--variable syntax--other syntax--object syntax--property">returncode</span><span class="syntax--punctuation syntax--section syntax--embedded">}</span></span>]'</span>)</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">if</span> stdout:</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">f'[stdout]<span class="syntax--constant syntax--character syntax--escape">\n</span><span class="syntax--meta syntax--embedded"><span class="syntax--punctuation syntax--section syntax--embedded">{</span>stdout.<span class="syntax--entity syntax--name syntax--function">decode</span>()<span class="syntax--punctuation syntax--section syntax--embedded">}</span></span>'</span>)</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">if</span> stderr:</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">f'[stderr]<span class="syntax--constant syntax--character syntax--escape">\n</span><span class="syntax--meta syntax--embedded"><span class="syntax--punctuation syntax--section syntax--embedded">{</span>stderr.<span class="syntax--entity syntax--name syntax--function">decode</span>()<span class="syntax--punctuation syntax--section syntax--embedded">}</span></span>'</span>)</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python">asyncio.<span class="syntax--entity syntax--name syntax--function">run</span>(<span class="syntax--entity syntax--name syntax--function">run</span>(<span class="syntax--string syntax--quoted">'ls /pythonfiles'</span>))</span></span></pre>
+<h4>2.4 异步操作队列</h4>
+<p>asyncio.Queue(maxsize=0, *, loop=None)
+和python内置的queue模块使用方法相同，区别是put()， get()等方法可异步执行；</p>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">import</span> asyncio</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">async</span> <span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">worker1</span>(<span class="syntax--variable syntax--parameter syntax--function">queue</span>):</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">'aaaa'</span>)</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>a <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--keyword syntax--control">await</span> queue.<span class="syntax--entity syntax--name syntax--function">get</span>()</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(a)</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">async</span> <span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">worker2</span>(<span class="syntax--variable syntax--parameter syntax--function">queue</span>):</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">await</span> asyncio.<span class="syntax--entity syntax--name syntax--function">sleep</span>(<span class="syntax--constant syntax--numeric">2</span>)</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">'put to queue:'</span>)</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">await</span> queue.<span class="syntax--entity syntax--name syntax--function">put</span>(<span class="syntax--constant syntax--numeric">3</span>)</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">async</span> <span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">main</span>():</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>queue <span class="syntax--keyword syntax--operator">=</span> asyncio.<span class="syntax--entity syntax--name syntax--function">Queue</span>()</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>task1 <span class="syntax--keyword syntax--operator">=</span> asyncio.<span class="syntax--entity syntax--name syntax--function">create_task</span>(<span class="syntax--entity syntax--name syntax--function">worker1</span>(queue))</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>task2 <span class="syntax--keyword syntax--operator">=</span> asyncio.<span class="syntax--entity syntax--name syntax--function">create_task</span>(<span class="syntax--entity syntax--name syntax--function">worker2</span>(queue))</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">await</span> task1</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">await</span> task2</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python">asyncio.<span class="syntax--entity syntax--name syntax--function">run</span>(<span class="syntax--entity syntax--name syntax--function">main</span>())</span></span></pre>
+<h3>3.概念</h3>
+<h4>3.1 awaitable</h4>
 <p>可以用在await表达式中的对象, 主要有3种: coroutines, Tasks, 和 Futures.</p>
 <p>tasks: asyncio.create_task()返回的对象;</p>
 <p>Future是一个特殊的低级别等待对象，它表示异步操作的最终结果。
 当等待Future对象时，它意味着协程将会等到Future在其他地方解析。</p>
-<h4 id="22-task对象">2.2 task对象</h4>
+<h4>3.2 task对象</h4>
 <blockquote>
 <p>Tasks are used to run coroutines in event loops. If a coroutine awaits on a Future, the Task suspends the execution of the coroutine and waits for the completion of the Future. When the Future is done, the execution of the wrapped coroutine resumes.</p>
 </blockquote>
 <blockquote>
 <p>Use the high-level asyncio.create_task() function to create Tasks, or the low-level loop.create_task() or ensure_future() functions. Manual instantiation of Tasks is discouraged.</p>
 </blockquote>
-<p>task对象用于在事件循环内运行协程;通常通过asyncio.create_task(),  loop.create_task() 或者 ensure_future()来生成;</p>
-<h4 id="23-api">2.3 api</h4>
+<p>task对象用于在事件循环内运行, 管理协程;通常通过asyncio.create_task(),  loop.create_task() 或者 ensure_future()来生成, 具有如下几个方法:
+<br></p>
+<p>(1) <strong>cancel()</strong><br>
+取消协程的运行, 会抛出一个CanceldeError;<br></p>
+<p>(2) <strong>canceled()/done()</strong> <br>
+task是否取消/完成;<br></p>
+<p>(3) <strong>result()/exception()</strong> <br>
+返回task运行异常/结果, 或者CanceledError, InvalidStateError; <br></p>
+<p>(4) <strong>add_done_callback(callback, *, context=None) / remove_done_callback(callback)</strong><br>
+添加/移除回调函数, task运行完成后执行;</p>
+<p>(5) <strong>get_stack(*, limit=None) / print_stack(*, limit=None, file=None)</strong> <br></p>
+<blockquote>
+<p>Return the list of stack frames for this Task.
+If the wrapped coroutine is not done, this returns the stack where it is suspended. If the coroutine has completed successfully or was cancelled, this returns an empty list. If the coroutine was terminated by an exception, this returns the list of traceback frames.</p>
+</blockquote>
+<p>返回task中协程挂起位置的frame的列表, 如果task已运行结束, 返回空列表;</p>
+<h4>3.3 future对象</h4>
+<blockquote>
+<p>Future objects are used to bridge low-level callback-based code with high-level async/await code.</p>
+</blockquote>
+<p>是连接底层的基于回调的代码和上层async/await的桥梁, 它代表一个异步操作的最终结果;<br></p>
+<p>(1)result() / exception()</p>
+<blockquote>
+<p>Return the result of the Future.</p>
+</blockquote>
+<p>获取future中的结果/异常;</p>
+<p>(2)set_result(result)<br></p>
+<blockquote>
+<p>Mark the Future as done and set its result.</p>
+</blockquote>
+<p>标记future已完成并设置future的结果;</p>
+<p>(3)set_exception(exception)</p>
+<blockquote>
+<p>Mark the Future as done and set an exception.</p>
+</blockquote>
+<p>标记future已完成并设置一个异常;</p>
+<p>(4)done() / cancelled()</p>
+<p>(5)add_done_callback(callback, *, context=None) \ remove_done_callback(callback)
+添加或移除future完成时执行的回调函数, context参数可指定运行时的上下文;</p>
+<p>(6)cancel()
+取消future对象的等待并开始运行回调函数;</p>
+<p>(7)get_loop()</p>
+<blockquote>
+<p>Return the event loop the Future object is bound to.</p>
+</blockquote>
+<p>获取future绑定的事件循环对象;</p>
+<p>(8)asyncio.isfuture(obj)<br>
+判断一个对象是否为future对象；</p>
+<p>(9)asyncio.ensure_future(obj, *, loop=None)<br>
+创建task对象；</p>
+<p>(10)asyncio.wrap_future(future, *, loop=None)<br>
+将一个concurrent.futures.Future对象封装为asyncio.Future对象；</p>
+<h4>3.4 event loop</h4>
+<blockquote>
+<p>The event loop is the core of every asyncio application. Event loops run asynchronous tasks and callbacks, perform network IO operations, and run subprocesses.</p>
+</blockquote>
+<p>asyncio用event loop来运行异步任务和回调函数，建立或监听网络连接，运行子程序；</p>
+<p>(1)loop.run_until_complete(future)</p>
+<blockquote>
+<p>Run until the future (an instance of Future) has completed.</p>
+</blockquote>
+<p>运行事件循环直到future执行完成；</p>
+<p>(2)loop.run_forever()</p>
+<blockquote>
+<p>Run the event loop until stop() is called.</p>
+</blockquote>
+<p>运行事件循环直到stop()执行；</p>
+<p>(3)loop.stop()/loop.is_running()/loop.is_closed()/loop.close()</p>
+<blockquote>
+<p>If stop() is called while run_forever() is running, the loop will run the current batch of callbacks and then exit.</p>
+</blockquote>
+<p>(4)loop.shutdown_asyncgens()</p>
+<blockquote>
+<p>Schedule all currently open asynchronous generator objects to close with an aclose() call. After calling this method, the event loop will issue a warning if a new asynchronous generator is iterated. This should be used to reliably finalize all scheduled asynchronous generators.</p>
+</blockquote>
+<h5>3.4.1 添加回调函数</h5>
+<p>(1)loop.call_soon(callback, *args, context=None)</p>
+<blockquote>
+<p>Schedule a callback to be called with args arguments at the next iteration of the event loop.</p>
+</blockquote>
+<p>在事件循环的下一次迭代中执行回调；
+loop.call_soon_threadsafe(callback, *args, context=None)线程安全版</p>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">import</span> asyncio</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">hello_world</span>(<span class="syntax--variable syntax--parameter syntax--function">loop</span>):</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--string syntax--quoted">"""A callback to print 'Hello World' and stop the event loop"""</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">'Hello World'</span>)</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>loop.<span class="syntax--entity syntax--name syntax--function">stop</span>()</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python">loop <span class="syntax--keyword syntax--operator">=</span> asyncio.<span class="syntax--entity syntax--name syntax--function">get_event_loop</span>()</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line"># Schedule a call to hello_world()</span></span></span>
+<span class=""><span class="syntax--source syntax--python">loop.<span class="syntax--entity syntax--name syntax--function">call_soon</span>(hello_world, loop)</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line"># Blocking call interrupted by loop.stop()</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">try</span>:</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>loop.<span class="syntax--entity syntax--name syntax--function">run_forever</span>()</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">finally</span>:</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>loop.<span class="syntax--entity syntax--name syntax--function">close</span>()</span></span></pre>
+<p>(2)loop.call_later(delay, callback, *args, context=None)
+loop.call_at(when, callback, *args, context=None)<br>
+设置回调运行的时间;</p>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">import</span> asyncio</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">import</span> datetime</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">display_date</span>(<span class="syntax--variable syntax--parameter syntax--function">end_time</span>, <span class="syntax--variable syntax--parameter syntax--function">loop</span>):</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(datetime.<span class="syntax--variable syntax--other syntax--object syntax--property">datetime</span>.<span class="syntax--entity syntax--name syntax--function">now</span>())</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">if</span> (loop.<span class="syntax--entity syntax--name syntax--function">time</span>() <span class="syntax--keyword syntax--operator">+</span> <span class="syntax--constant syntax--numeric">1.0</span>) <span class="syntax--keyword syntax--operator">&lt;</span> end_time:</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span>loop.<span class="syntax--entity syntax--name syntax--function">call_later</span>(<span class="syntax--constant syntax--numeric">1</span>, display_date, end_time, loop)</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">else</span>:</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span>loop.<span class="syntax--entity syntax--name syntax--function">stop</span>()</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python">loop <span class="syntax--keyword syntax--operator">=</span> asyncio.<span class="syntax--entity syntax--name syntax--function">get_event_loop</span>()</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line"># Schedule the first call to display_date()</span></span></span>
+<span class=""><span class="syntax--source syntax--python">end_time <span class="syntax--keyword syntax--operator">=</span> loop.<span class="syntax--entity syntax--name syntax--function">time</span>() <span class="syntax--keyword syntax--operator">+</span> <span class="syntax--constant syntax--numeric">5.0</span></span></span>
+<span class=""><span class="syntax--source syntax--python">loop.<span class="syntax--entity syntax--name syntax--function">call_soon</span>(display_date, end_time, loop)</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line"># Blocking call interrupted by loop.stop()</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">try</span>:</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>loop.<span class="syntax--entity syntax--name syntax--function">run_forever</span>()</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">finally</span>:</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>loop.<span class="syntax--entity syntax--name syntax--function">close</span>()</span></span></pre>
+<h5>3.4.2 创建future，task对象</h5>
+<p>(1)loop.create_future() / loop.create_task(coro)
+创建future/task对象；</p>
+<h5>3.4.3 创建网络连接</h5>
+<p>(1)loop.create_connection(protocol_factory, host=None, port=None, *, ssl=None, family=0, proto=0, flags=0, sock=None, local_addr=None, server_hostname=None, ssl_handshake_timeout=None)<br>
+以给定参数建立一个tcp连接，返回（transport, protocol)的元组；</p>
+<p>(2)loop.create_datagram_endpoint(protocol_factory, local_addr=None, remote_addr=None, *, family=0, proto=0, flags=0, reuse_address=None, reuse_port=None, allow_broadcast=None, sock=None)<br>
+返回（transport, protocol)的元组,用于udp通信；</p>
+<p>(3)loop.create_unix_connection(protocol_factory, path=None, *, ssl=None, sock=None, server_hostname=None, ssl_handshake_timeout=None)<br>
+创建基于Unix文件的连接，返回（transport, protocol)的元组；</p>
+<h5>3.4.4 创建network server</h5>
+<p>(1)loop.create_server(protocol_factory, host=None, port=None, *, family=socket.AF_UNSPEC, flags=socket.AI_PASSIVE, sock=None, backlog=100, ssl=None, reuse_address=None, reuse_port=None, ssl_handshake_timeout=None, start_serving=True)<br>
+创建tcp server监听对应的端口, 返回一个server对象;</p>
+<p>(2)loop.create_unix_server(protocol_factory, path=None, *, sock=None, backlog=100, ssl=None, ssl_handshake_timeout=None, start_serving=True))<br>
+按对应的文件创建一个unix server, 返回一个server对象;</p>
+<p>(3)loop.connect_accepted_socket(protocol_factory, sock, *, ssl=None, ssl_handshake_timeout=None)<br>
+将一个已经连接的socket对象封装为asyncio可处理的transport, protocol对象;</p>
+<h5>3.4.5 发送文件</h5>
+<p>(1)loop.sendfile(transport, file, offset=0, count=None, *, fallback=True)<br>
+方法内部使用os.sendfile()发送文件;</p>
+<h5>3.4.6 监听文件描述符</h5>
+<p>(1)loop.add_reader(fd, callback, *args) / loop.remove_reader(fd)</p>
+<blockquote>
+<p>Start monitoring the fd file descriptor for read availability and invoke callback with the specified arguments once fd is available for reading.)</p>
+</blockquote>
+<p>监听或取消对文件描述符, 如果文件描述符可读,则执行callback;</p>
+<p>(2)loop.add_writer(fd, callback, *args) / loop.remove_writer(fd)</p>
+<blockquote>
+<p>Start monitoring the fd file descriptor for write availability and invoke callback with the specified arguments once fd is available for writing.)</p>
+</blockquote>
+<p>监听或取消对文件描述符, 如果文件描述符可写入,则执行callback;</p>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">import</span> asyncio</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">from</span> socket <span class="syntax--keyword syntax--control">import</span> socketpair</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line"># Create a pair of connected file descriptors</span></span></span>
+<span class=""><span class="syntax--source syntax--python">rsock, wsock <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--entity syntax--name syntax--function">socketpair</span>()</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python">loop <span class="syntax--keyword syntax--operator">=</span> asyncio.<span class="syntax--entity syntax--name syntax--function">get_event_loop</span>()</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">reader</span>():</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>data <span class="syntax--keyword syntax--operator">=</span> rsock.<span class="syntax--entity syntax--name syntax--function">recv</span>(<span class="syntax--constant syntax--numeric">100</span>)</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">"Received:"</span>, data.<span class="syntax--entity syntax--name syntax--function">decode</span>())</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--comment syntax--line"># We are done: unregister the file descriptor</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>loop.<span class="syntax--entity syntax--name syntax--function">remove_reader</span>(rsock)</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--comment syntax--line"># Stop the event loop</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>loop.<span class="syntax--entity syntax--name syntax--function">stop</span>()</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line"># Register the file descriptor for read event</span></span></span>
+<span class=""><span class="syntax--source syntax--python">loop.<span class="syntax--entity syntax--name syntax--function">add_reader</span>(rsock, reader)</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line"># Simulate the reception of data from the network</span></span></span>
+<span class=""><span class="syntax--source syntax--python">loop.<span class="syntax--entity syntax--name syntax--function">call_soon</span>(wsock.<span class="syntax--variable syntax--other syntax--object syntax--property">send</span>, <span class="syntax--string syntax--quoted">'abc'</span>.<span class="syntax--entity syntax--name syntax--function">encode</span>())</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">try</span>:</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--comment syntax--line"># Run the event loop</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>loop.<span class="syntax--entity syntax--name syntax--function">run_forever</span>()</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">finally</span>:</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--comment syntax--line"># We are done. Close sockets and the event loop.</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>rsock.<span class="syntax--entity syntax--name syntax--function">close</span>()</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>wsock.<span class="syntax--entity syntax--name syntax--function">close</span>()</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>loop.<span class="syntax--entity syntax--name syntax--function">close</span>()</span></span></pre>
+<h5>3.4.7 异步socket</h5>
+<p>(1)loop.sock_recv(sock, nbytes)</p>
+<blockquote>
+<p>Receive up to nbytes from sock. Asynchronous version of socket.recv().</p>
+</blockquote>
+<p>(2)loop.sock_sendall(sock, data)</p>
+<blockquote>
+<p>Send data to the sock socket. Asynchronous version of socket.sendall().</p>
+</blockquote>
+<p>(3)loop.sock_connect(sock, address)</p>
+<blockquote>
+<p>Connect sock to a remote socket at address.
+Asynchronous version of socket.connect().</p>
+</blockquote>
+<p>(4)loop.sock_accept(sock)</p>
+<blockquote>
+<p>Accept a connection. Modeled after the blocking socket.accept() method.</p>
+</blockquote>
+<p>(5)loop.sock_sendfile(sock, file, offset=0, count=None, *, fallback=True)</p>
+<blockquote>
+<p>Send a file using high-performance os.sendfile if possible. Return the total number of bytes sent.
+Asynchronous version of socket.sendfile().)</p>
+</blockquote>
+<h5>3.4.8 在线程或进程池中执行代码</h5>
+<p>(1)loop.run_in_executor(executor, func, *args)</p>
+<blockquote>
+<p>Arrange for func to be called in the specified executor.
+The executor argument should be an concurrent.futures.Executor instance. The default executor is used if executor is None.</p>
+</blockquote>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">import</span> asyncio</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">import</span> concurrent.futures</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">blocking_io</span>():</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">with</span> <span class="syntax--support syntax--function">open</span>(<span class="syntax--string syntax--quoted">'/dev/urandom'</span>, <span class="syntax--string syntax--quoted">'rb'</span>) <span class="syntax--keyword syntax--control">as</span> f:</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--keyword syntax--control">return</span> f.<span class="syntax--entity syntax--name syntax--function">read</span>(<span class="syntax--constant syntax--numeric">100</span>)</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">cpu_bound</span>():</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">return</span> <span class="syntax--support syntax--function">sum</span>(i <span class="syntax--keyword syntax--operator">*</span> i <span class="syntax--keyword syntax--control">for</span> i <span class="syntax--keyword syntax--operator syntax--logical syntax--python">in</span> <span class="syntax--support syntax--function">range</span>(<span class="syntax--constant syntax--numeric">10</span> <span class="syntax--keyword syntax--operator">**</span> <span class="syntax--constant syntax--numeric">7</span>))</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">async</span> <span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">main</span>():</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>loop <span class="syntax--keyword syntax--operator">=</span> asyncio.<span class="syntax--entity syntax--name syntax--function">get_running_loop</span>()</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--comment syntax--line">## Options:</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--comment syntax--line"># 1. Run in the default loop's executor:</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>result <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--keyword syntax--control">await</span> loop.<span class="syntax--entity syntax--name syntax--function">run_in_executor</span>(</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--constant syntax--language">None</span>, blocking_io)</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">'default thread pool'</span>, result)</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--comment syntax--line"># 2. Run in a custom thread pool:</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">with</span> concurrent.<span class="syntax--variable syntax--other syntax--object syntax--property">futures</span>.<span class="syntax--entity syntax--name syntax--function">ThreadPoolExecutor</span>() <span class="syntax--keyword syntax--control">as</span> pool:</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span>result <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--keyword syntax--control">await</span> loop.<span class="syntax--entity syntax--name syntax--function">run_in_executor</span>(</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">            </span>pool, blocking_io)</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">'custom thread pool'</span>, result)</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--comment syntax--line"># 3. Run in a custom process pool:</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">with</span> concurrent.<span class="syntax--variable syntax--other syntax--object syntax--property">futures</span>.<span class="syntax--entity syntax--name syntax--function">ProcessPoolExecutor</span>() <span class="syntax--keyword syntax--control">as</span> pool:</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span>result <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--keyword syntax--control">await</span> loop.<span class="syntax--entity syntax--name syntax--function">run_in_executor</span>(</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">            </span>pool, cpu_bound)</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">'custom process pool'</span>, result)</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python">asyncio.<span class="syntax--entity syntax--name syntax--function">run</span>(<span class="syntax--entity syntax--name syntax--function">main</span>())</span></span></pre>
+<h5>3.4.9 执行命令行指令</h5>
+<p>(1)loop.subprocess_exec(protocol_factory, *args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kwargs)<br></p>
+<blockquote>
+<p>Create a subprocess from one or more string arguments specified by args.
+This is similar to the standard library subprocess.Popen class called with shell=False; Returns a pair of (transport, protocol)</p>
+</blockquote>
+<p>(2) loop.subprocess_shell(protocol_factory, cmd, *, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kwargs)</p>
+<blockquote>
+<p>Create a subprocess from cmd; This is similar to the standard library subprocess.Popen class called with shell=True.</p>
+</blockquote>
+<h4>3.5 Handle/TimeHandle对象</h4>
+<p>由loop.call_soon(), loop.call_soon_threadsafe()返回, 可用于取消callback（3.7新增）:<br>
+(1) cancel()</p>
+<blockquote>
+<p>Cancel the callback. If the callback has already been canceled or executed, this method has no effect.</p>
+</blockquote>
+<p>(2) cancelled()</p>
+<blockquote>
+<p>Return True if the callback was cancelled.</p>
+</blockquote>
+<h4>3.6 server对象</h4>
+<p>由loop.create_server(), loop.create_unix_server()等方法返回，可对创建的server进行一些控制；
+(1)start_serving()<br></p>
+<blockquote>
+<p>Start accepting connections.
+This method is idempotent, so it can be called when the server is already being serving</p>
+</blockquote>
+<p>开始接受连接， 主要在loop.create_server()和asyncio.start_server()的start_serving参数设为false时使用；</p>
+<p>(2)serve_forever()</p>
+<blockquote>
+<p>Start accepting connections until the coroutine is cancelled. Cancellation of serve_forever task causes the server to be closed.</p>
+</blockquote>
+<p>开始接受连接，直到协程被取消；</p>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">async</span> <span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">client_connected</span>(<span class="syntax--variable syntax--parameter syntax--function">reader</span>, <span class="syntax--variable syntax--parameter syntax--function">writer</span>):</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--comment syntax--line"># Communicate with the client with</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--comment syntax--line"># reader/writer streams.  For example:</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">await</span> reader.<span class="syntax--entity syntax--name syntax--function">readline</span>()</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">async</span> <span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">main</span>(<span class="syntax--variable syntax--parameter syntax--function">host</span>, <span class="syntax--variable syntax--parameter syntax--function">port</span>):</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>srv <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--keyword syntax--control">await</span> asyncio.<span class="syntax--entity syntax--name syntax--function">start_server</span>(</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span>client_connected, host, port)</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">await</span> srv.<span class="syntax--entity syntax--name syntax--function">serve_forever</span>()</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python">asyncio.<span class="syntax--entity syntax--name syntax--function">run</span>(<span class="syntax--entity syntax--name syntax--function">main</span>(<span class="syntax--string syntax--quoted">'127.0.0.1'</span>, <span class="syntax--constant syntax--numeric">0</span>))</span></span></pre>
+<p>(3) wait_closed()</p>
+<blockquote>
+<p>Wait until the close() method completes.</p>
+</blockquote>
+<p>异步等待server关闭；</p>
+<h4>3.7 transport和protocol</h4>
+<blockquote>
+<p>At the highest level, the transport is concerned with how bytes are transmitted, while the protocol determines which bytes to transmit (and to some extent when).</p>
+</blockquote>
+<blockquote>
+<p>A different way of saying the same thing: a transport is an abstraction for a socket (or similar I/O endpoint) while a protocol is an abstraction for an application, from the transport’s point of view.</p>
+</blockquote>
+<blockquote>
+<p>the protocol calls transport methods to send data, while the transport calls protocol methods to pass it data that has been received.</p>
+</blockquote>
+<p>transport决定数据如何传输(socket)， protocol决定传输什么数据以及何时传递(application)；transport和protocol成对使用，protocol调用transport的方法来发送数据，transport调用protocol的方法来将接受到的数据传递给protocol;</p>
+<h5>3.7.1 transport</h5>
+<p><strong>Transport, DatagramTransport, SubprocessTransport<br></strong>
+(1)close() / is_closing() / abort()<br>
+close()关闭transport，然后调用protocol.connection_lost()；如果有数据正在传输，等待传输完成;
+abort()立即关闭transport， 正在传输的数据会丢失；</p>
+<p>(2)set_protocol(protocol) / get_protocol()
+设置或获取protocol；</p>
+<p>(3)pause_reading() / resume_reading()<br>
+暂停接收数据/恢复接受数据， 用于控制数据接收； 数据接收完成会调用 protocol.data_received()</p>
+<p>(4)can_write_eof() / write_eof()<br>
+是否有can_write_eof()方法/在发送完所有数据后关闭transport的输入流；</p>
+<p>(5)set_write_buffer_limits(high=None, low=None) / get_write_buffer_limits()</p>
+<blockquote>
+<p>Set the high and low watermarks for write flow control.</p>
+</blockquote>
+<blockquote>
+<p>These two values (measured in number of bytes) control when the protocol’s protocol.pause_writing() and protocol.resume_writing() methods are called. If specified, the low watermark must be less than or equal to the high watermark. Neither high nor low can be negative.</p>
+</blockquote>
+<blockquote>
+<p>pause_writing() is called when the buffer size becomes greater than or equal to the high value. If writing has been paused, resume_writing() is called when the buffer size becomes less than or equal to the low value.</p>
+</blockquote>
+<p>设置写入数据的缓冲区的上下限；当缓冲数据超过high值会调用protocol的pause_writing(), 当缓冲数据大小低于low值将会调用protocol的resume_writing();</p>
+<p>(6)write(data) / writelines(list_of_data) <br>
+向transport异步写入数据;</p>
+<p>(7)DatagramTransport.sendto(data, addr=None)<br>
+发送数据报格式的数据;</p>
+<p>(8)SubprocessTransport.get_pipe_transport(fd)</p>
+<blockquote>
+<p>Return the transport for the communication pipe corresponding to the integer file descriptor fd:</p>
+</blockquote>
+<ul>
+<li>0: readable streaming transport of the standard input (stdin), or None if the subprocess was not created with stdin=PIPE</li>
+<li>1: writable streaming transport of the standard output (stdout), or None if the subprocess was not created with stdout=PIPE</li>
+<li>2: writable streaming transport of the standard error (stderr), or None if the subprocess was not created with stderr=PIPE</li>
+</ul>
+<h5>3.7.2 protocol</h5>
+<p>protocol用于提供发送的数据,处理接收到的数据, 主要以回调的形式调用;
+(1)connection_made(transport)</p>
+<blockquote>
+<p>Called when a connection is made.</p>
+</blockquote>
+<p>当连接建立时调用;
+(2)connection_lost(exc)</p>
+<blockquote>
+<p>Called when the connection is lost or closed.</p>
+</blockquote>
+<p>当连接丢失或关闭时调用,exec是异常对象或None;</p>
+<p>(3)pause_writing()</p>
+<blockquote>
+<p>Called when the transport’s buffer goes over the high watermark.</p>
+</blockquote>
+<p>(4)resume_writing()</p>
+<blockquote>
+<p>Called when the transport’s buffer drains below the low watermark.</p>
+</blockquote>
+<p>(5)Protocol.data_received(data)</p>
+<blockquote>
+<p>Called when some data is received. data is a non-empty bytes object containing the incoming data.</p>
+</blockquote>
+<p>当transport接收到数据时调用;</p>
+<p>(6)Protocol.eof_received()</p>
+<blockquote>
+<p>Called when the other end signals it won’t send any more data (for example by calling transport.write_eof(), if the other end also uses asyncio).</p>
+</blockquote>
+<p>当收到另一端停止发送数据的信号时调用, 停止接收数据;</p>
+<p>(7)DatagramProtocol.datagram_received(data, addr)<br>
+当transport接收到数据时调用;</p>
+<p>(8)SubprocessProtocol.pipe_data_received(fd, data)</p>
+<blockquote>
+<p>Called when the child process writes data into its stdout or stderr pipe.
+fd is the integer file descriptor of the pipe.</p>
+</blockquote>
+<p>当子进程将数据写入stdout或stderr时调用;</p>
+<p>(9)SubprocessProtocol.pipe_connection_lost(fd, exc)</p>
+<blockquote>
+<p>Called when one of the pipes communicating with the child process is closed.
+fd is the integer file descriptor that was closed.</p>
+</blockquote>
+<p>当和子进程通信的管道关闭时调用;</p>
+<p>(10)SubprocessProtocol.process_exited()</p>
+<blockquote>
+<p>Called when the child process has exited.</p>
+</blockquote>
+<p>当子进程退出时调用;</p>
+<h4>3.8 StreamReader和StreamWriter</h4>
+<h5>3.8.1 StreamReader</h5>
+<p>(1)read(n=-1) / readexactly(n)<br>
+读取n字节数据， -1代表读取完, readexactly表示如果不到n字节会抛出错误；</p>
+<p>(2)readline()</p>
+<blockquote>
+<p>Read one line, where “line” is a sequence of bytes ending with \n.</p>
+</blockquote>
+<p>(3)readuntil(separator=b’\n’)</p>
+<blockquote>
+<p>Read data from the stream until separator is found.</p>
+</blockquote>
+<h5>3.8.2 StreamWriter</h5>
+<p>(1)write(data) / writelines(data)
+发送数据，和drain()一起连用, 进行缓冲数据流的控制；</p>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python">writer.<span class="syntax--entity syntax--name syntax--function">write</span>(data)</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">await</span> writer.<span class="syntax--entity syntax--name syntax--function">drain</span>()</span></span></pre>
+<p>(2)drain()</p>
+<blockquote>
+<p>Wait until it is appropriate to resume writing to the stream</p>
+</blockquote>
+<p>等待直到缓冲区可以继续写入</p>
+<p>(3)close()</p>
+<blockquote>
+<p>Close the stream.</p>
+</blockquote>
+<p>关闭连接，和wait_closed()连用；</p>
+<h4>3.9 Process 对象</h4>
+<p>和subprocess.Popen对象相似；<br>
+(1)communicate(input=None)</p>
+<blockquote>
+<p>Interact with process:</p>
+</blockquote>
+<ul>
+<li>send data to stdin (if input is not None);</li>
+<li>read data from stdout and stderr, until EOF is reached;</li>
+<li>wait for process to terminate.</li>
+</ul>
+<p>返回数据： (stdout_data, stderr_data).</p>
+<h3>4. api</h3>
 <p>(1)asyncio.run(coro, *, debug=False)</p>
 <blockquote>
 <p>This function runs the passed coroutine, taking care of managing the asyncio event loop and finalizing asynchronous generators.</p>
@@ -620,12 +1010,42 @@ pre.editor-colors .fold-marker:after {
 <p>Run awaitable objects in the aws sequence concurrently.</p>
 </blockquote>
 <p>异步执行多个task, 返回一个执行结果的列表; return_exceptions决定是否返回抛出的异常;</p>
-<pre class="editor-colors lang-python"><div class="line"><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">import</span> asyncio</span></div><div class="line"></div><div class="line"><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">async</span> <span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">factorial</span>(<span class="syntax--variable syntax--parameter syntax--function">name</span>, <span class="syntax--variable syntax--parameter syntax--function">number</span>):</span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>f <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--constant syntax--numeric">1</span></span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">for</span> i <span class="syntax--keyword syntax--operator syntax--logical syntax--python">in</span> <span class="syntax--support syntax--function">range</span>(<span class="syntax--constant syntax--numeric">2</span>, number <span class="syntax--keyword syntax--operator">+</span> <span class="syntax--constant syntax--numeric">1</span>):</span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">f"Task <span class="syntax--meta syntax--embedded"><span class="syntax--punctuation syntax--section syntax--embedded">{</span>name<span class="syntax--punctuation syntax--section syntax--embedded">}</span></span>: Compute factorial(<span class="syntax--meta syntax--embedded"><span class="syntax--punctuation syntax--section syntax--embedded">{</span>i<span class="syntax--punctuation syntax--section syntax--embedded">}</span></span>)..."</span>)</span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--keyword syntax--control">await</span> asyncio.<span class="syntax--entity syntax--name syntax--function">sleep</span>(<span class="syntax--constant syntax--numeric">1</span>)</span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span>f <span class="syntax--keyword syntax--operator">*=</span> i</span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">f"Task <span class="syntax--meta syntax--embedded"><span class="syntax--punctuation syntax--section syntax--embedded">{</span>name<span class="syntax--punctuation syntax--section syntax--embedded">}</span></span>: factorial(<span class="syntax--meta syntax--embedded"><span class="syntax--punctuation syntax--section syntax--embedded">{</span>number<span class="syntax--punctuation syntax--section syntax--embedded">}</span></span>) = <span class="syntax--meta syntax--embedded"><span class="syntax--punctuation syntax--section syntax--embedded">{</span>f<span class="syntax--punctuation syntax--section syntax--embedded">}</span></span>"</span>)</span></div><div class="line"></div><div class="line"><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">async</span> <span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">main</span>():</span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--comment syntax--line"># Schedule three calls *concurrently*:</span></span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">await</span> asyncio.<span class="syntax--entity syntax--name syntax--function">gather</span>(</span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--entity syntax--name syntax--function">factorial</span>(<span class="syntax--string syntax--quoted">"A"</span>, <span class="syntax--constant syntax--numeric">2</span>),</span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--entity syntax--name syntax--function">factorial</span>(<span class="syntax--string syntax--quoted">"B"</span>, <span class="syntax--constant syntax--numeric">3</span>),</span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--entity syntax--name syntax--function">factorial</span>(<span class="syntax--string syntax--quoted">"C"</span>, <span class="syntax--constant syntax--numeric">4</span>),</span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>)</span></div><div class="line"></div><div class="line"><span class="syntax--source syntax--python">asyncio.<span class="syntax--entity syntax--name syntax--function">run</span>(<span class="syntax--entity syntax--name syntax--function">main</span>())</span></div><div class="line"></div><div class="line"><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line"># Expected output:</span></span></div><div class="line"><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line">#</span></span></div><div class="line"><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line">#     Task A: Compute factorial(2)...</span></span></div><div class="line"><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line">#     Task B: Compute factorial(2)...</span></span></div><div class="line"><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line">#     Task C: Compute factorial(2)...</span></span></div><div class="line"><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line">#     Task A: factorial(2) = 2</span></span></div><div class="line"><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line">#     Task B: Compute factorial(3)...</span></span></div><div class="line"><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line">#     Task C: Compute factorial(3)...</span></span></div><div class="line"><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line">#     Task B: factorial(3) = 6</span></span></div><div class="line"><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line">#     Task C: Compute factorial(4)...</span></span></div><div class="line"><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line">#     Task C: factorial(4) = 24</span></span></div></pre>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">import</span> asyncio</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">async</span> <span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">factorial</span>(<span class="syntax--variable syntax--parameter syntax--function">name</span>, <span class="syntax--variable syntax--parameter syntax--function">number</span>):</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>f <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--constant syntax--numeric">1</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">for</span> i <span class="syntax--keyword syntax--operator syntax--logical syntax--python">in</span> <span class="syntax--support syntax--function">range</span>(<span class="syntax--constant syntax--numeric">2</span>, number <span class="syntax--keyword syntax--operator">+</span> <span class="syntax--constant syntax--numeric">1</span>):</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">f"Task <span class="syntax--meta syntax--embedded"><span class="syntax--punctuation syntax--section syntax--embedded">{</span>name<span class="syntax--punctuation syntax--section syntax--embedded">}</span></span>: Compute factorial(<span class="syntax--meta syntax--embedded"><span class="syntax--punctuation syntax--section syntax--embedded">{</span>i<span class="syntax--punctuation syntax--section syntax--embedded">}</span></span>)..."</span>)</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--keyword syntax--control">await</span> asyncio.<span class="syntax--entity syntax--name syntax--function">sleep</span>(<span class="syntax--constant syntax--numeric">1</span>)</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span>f <span class="syntax--keyword syntax--operator">*=</span> i</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">f"Task <span class="syntax--meta syntax--embedded"><span class="syntax--punctuation syntax--section syntax--embedded">{</span>name<span class="syntax--punctuation syntax--section syntax--embedded">}</span></span>: factorial(<span class="syntax--meta syntax--embedded"><span class="syntax--punctuation syntax--section syntax--embedded">{</span>number<span class="syntax--punctuation syntax--section syntax--embedded">}</span></span>) = <span class="syntax--meta syntax--embedded"><span class="syntax--punctuation syntax--section syntax--embedded">{</span>f<span class="syntax--punctuation syntax--section syntax--embedded">}</span></span>"</span>)</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">async</span> <span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">main</span>():</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--comment syntax--line"># Schedule three calls *concurrently*:</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">await</span> asyncio.<span class="syntax--entity syntax--name syntax--function">gather</span>(</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--entity syntax--name syntax--function">factorial</span>(<span class="syntax--string syntax--quoted">"A"</span>, <span class="syntax--constant syntax--numeric">2</span>),</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--entity syntax--name syntax--function">factorial</span>(<span class="syntax--string syntax--quoted">"B"</span>, <span class="syntax--constant syntax--numeric">3</span>),</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--entity syntax--name syntax--function">factorial</span>(<span class="syntax--string syntax--quoted">"C"</span>, <span class="syntax--constant syntax--numeric">4</span>),</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>)</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python">asyncio.<span class="syntax--entity syntax--name syntax--function">run</span>(<span class="syntax--entity syntax--name syntax--function">main</span>())</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line"># Expected output:</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line">#</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line">#     Task A: Compute factorial(2)...</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line">#     Task B: Compute factorial(2)...</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line">#     Task C: Compute factorial(2)...</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line">#     Task A: factorial(2) = 2</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line">#     Task B: Compute factorial(3)...</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line">#     Task C: Compute factorial(3)...</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line">#     Task B: factorial(3) = 6</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line">#     Task C: Compute factorial(4)...</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line">#     Task C: factorial(4) = 24</span></span></span></pre>
 <p>(5)asyncio.shield(aw, *, loop=None)</p>
 <blockquote>
 <p>Protect an awaitable object from being cancelled.</p>
 </blockquote>
-<pre class="editor-colors lang-python"><div class="line"><span class="syntax--source syntax--python">res <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--keyword syntax--control">await</span> <span class="syntax--entity syntax--name syntax--function">shield</span>(<span class="syntax--entity syntax--name syntax--function">something</span>())</span></div></pre>
+<pre class="editor-colors lang-python"><span class=""><span class="syntax--source syntax--python">res <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--keyword syntax--control">await</span> <span class="syntax--entity syntax--name syntax--function">shield</span>(<span class="syntax--entity syntax--name syntax--function">something</span>())</span></span></pre>
 <p>避免任务被取消;
 用于需要取消协程的情况,如果主协程被取消,那么shield可以避免内部的任务被取消;</p>
 <p>(6)asyncio.wait_for(aw, timeout, *, loop=None)</p>
@@ -633,7 +1053,23 @@ pre.editor-colors .fold-marker:after {
 <p>Wait for the aw awaitable to complete with a timeout.</p>
 </blockquote>
 <p>异步执行的超时控制, 当超时发生将抛出异常;</p>
-<pre class="editor-colors lang-python"><div class="line"><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">async</span> <span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">eternity</span>():</span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--comment syntax--line"># Sleep for one hour</span></span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">await</span> asyncio.<span class="syntax--entity syntax--name syntax--function">sleep</span>(<span class="syntax--constant syntax--numeric">3600</span>)</span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">'yay!'</span>)</span></div><div class="line"></div><div class="line"><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">async</span> <span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">main</span>():</span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--comment syntax--line"># Wait for at most 1 second</span></span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">try</span>:</span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--keyword syntax--control">await</span> asyncio.<span class="syntax--entity syntax--name syntax--function">wait_for</span>(<span class="syntax--entity syntax--name syntax--function">eternity</span>(), <span class="syntax--variable syntax--parameter syntax--function">timeout</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--numeric">1.0</span>)</span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">except</span> asyncio.<span class="syntax--variable syntax--other syntax--object syntax--property">TimeoutError</span>:</span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">'timeout!'</span>)</span></div><div class="line"></div><div class="line"><span class="syntax--source syntax--python">asyncio.<span class="syntax--entity syntax--name syntax--function">run</span>(<span class="syntax--entity syntax--name syntax--function">main</span>())</span></div><div class="line"></div><div class="line"><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line"># Expected output:</span></span></div><div class="line"><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line">#</span></span></div><div class="line"><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line">#     timeout!</span></span></div></pre>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">async</span> <span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">eternity</span>():</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--comment syntax--line"># Sleep for one hour</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">await</span> asyncio.<span class="syntax--entity syntax--name syntax--function">sleep</span>(<span class="syntax--constant syntax--numeric">3600</span>)</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">'yay!'</span>)</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">async</span> <span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">main</span>():</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--comment syntax--line"># Wait for at most 1 second</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">try</span>:</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--keyword syntax--control">await</span> asyncio.<span class="syntax--entity syntax--name syntax--function">wait_for</span>(<span class="syntax--entity syntax--name syntax--function">eternity</span>(), <span class="syntax--variable syntax--parameter syntax--function">timeout</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--numeric">1.0</span>)</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">except</span> asyncio.<span class="syntax--variable syntax--other syntax--object syntax--property">TimeoutError</span>:</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">'timeout!'</span>)</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python">asyncio.<span class="syntax--entity syntax--name syntax--function">run</span>(<span class="syntax--entity syntax--name syntax--function">main</span>())</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line"># Expected output:</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line">#</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line">#     timeout!</span></span></span></pre>
 <p>(7)asyncio.wait(aws, *, loop=None, timeout=None, return_when=ALL_COMPLETED)</p>
 <blockquote>
 <p>Run awaitable objects in the aws set concurrently and block until the condition specified by return_when.<br>
@@ -648,7 +1084,8 @@ Returns two sets of Tasks/Futures: (done, pending).</p>
 <th>Description</th>
 </tr>
 </thead>
-<tbody><tr>
+<tbody>
+<tr>
 <td>FIRST_COMPLETED</td>
 <td>The function will return when any future finishes or is cancelled.</td>
 </tr>
@@ -660,14 +1097,25 @@ Returns two sets of Tasks/Futures: (done, pending).</p>
 <td>ALL_COMPLETED</td>
 <td>The function will return when all futures finish or are cancelled.</td>
 </tr>
-</tbody></table>
-<pre class="editor-colors lang-python"><div class="line"><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">async</span> <span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">foo</span>():</span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">return</span> <span class="syntax--constant syntax--numeric">42</span></span></div><div class="line"></div><div class="line"><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">async</span> <span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">main</span>():</span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>task <span class="syntax--keyword syntax--operator">=</span> asyncio.<span class="syntax--entity syntax--name syntax--function">create_task</span>(<span class="syntax--entity syntax--name syntax--function">foo</span>())</span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>done, pending <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--keyword syntax--control">await</span> asyncio.<span class="syntax--entity syntax--name syntax--function">wait</span>({task})</span></div><div class="line"></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">if</span> task <span class="syntax--keyword syntax--operator syntax--logical syntax--python">in</span> done:</span></div><div class="line"><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--comment syntax--line"># do something</span></span></div><div class="line"></div><div class="line"><span class="syntax--source syntax--python">asyncio.<span class="syntax--entity syntax--name syntax--function">run</span>(<span class="syntax--entity syntax--name syntax--function">main</span>(), <span class="syntax--variable syntax--parameter syntax--function">debug</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--language">True</span>)</span></div></pre>
+</tbody>
+</table>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">async</span> <span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">foo</span>():</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">return</span> <span class="syntax--constant syntax--numeric">42</span></span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">async</span> <span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">main</span>():</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>task <span class="syntax--keyword syntax--operator">=</span> asyncio.<span class="syntax--entity syntax--name syntax--function">create_task</span>(<span class="syntax--entity syntax--name syntax--function">foo</span>())</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>done, pending <span class="syntax--keyword syntax--operator">=</span> <span class="syntax--keyword syntax--control">await</span> asyncio.<span class="syntax--entity syntax--name syntax--function">wait</span>({task})</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">if</span> task <span class="syntax--keyword syntax--operator syntax--logical syntax--python">in</span> done:</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--comment syntax--line"># do something</span></span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python">asyncio.<span class="syntax--entity syntax--name syntax--function">run</span>(<span class="syntax--entity syntax--name syntax--function">main</span>(), <span class="syntax--variable syntax--parameter syntax--function">debug</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--language">True</span>)</span></span></pre>
 <p>(8)asyncio.as_completed(aws, *, loop=None, timeout=None)</p>
 <blockquote>
 <p>Run awaitable objects in the aws set concurrently. Return an iterator of Future objects. Each Future object returned represents the earliest result from the set of the remaining awaitables.</p>
 </blockquote>
-<p>并发执行多个任务,并返回future对象的迭代器;
-(9)asyncio.run_coroutine_threadsafe(coro, loop)</p>
+<p>并发执行多个任务,并返回future对象的迭代器;<br></p>
+<p>(9)asyncio.run_coroutine_threadsafe(coro, loop)</p>
 <blockquote>
 <p>Submit a coroutine to the given event loop. Thread-safe.<br>
 Return a concurrent.futures.Future to wait for the result from another OS thread.</p>
@@ -683,16 +1131,57 @@ Return a concurrent.futures.Future to wait for the result from another OS thread
 <p>Return a set of not yet finished Task objects run by the loop.</p>
 </blockquote>
 <p>返回事件循环中所有的task对象;</p>
-<table>
-<thead>
-<tr>
-<th>aaa</th>
-<th>bbb</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>ccc</td>
-<td>ddd</td>
-</tr>
-</tbody></table></body>
-      </html>
+<p>(12)asyncio.iscoroutine(obj)<br>
+判断一个对象是否是协程对象</p>
+<p>(13)asyncio.iscoroutinefunction(func)<br>
+判断一个对象是否是协程函数(async def 或者 @asyncio.coroutine)</p>
+<p>(14)asyncio.open_connection(host=None, port=None, *, loop=None, limit=None, ssl=None, family=0, proto=0, flags=0, sock=None, local_addr=None, server_hostname=None, ssl_handshake_timeout=None)</p>
+<blockquote>
+<p>Establish a network connection and return a pair of (reader, writer) objects.</p>
+</blockquote>
+<p>利用给定的参数创建tcp连接，返回reader和writer对象；</p>
+<p>(15)asyncio.start_server(client_connected_cb, host=None, port=None, *, loop=None, limit=None, family=socket.AF_UNSPEC, flags=socket.AI_PASSIVE, sock=None, backlog=100, ssl=None, reuse_address=None, reuse_port=None, ssl_handshake_timeout=None, start_serving=True)¶</p>
+<blockquote>
+<p>Start a socket server.</p>
+</blockquote>
+<p>利用给定参数开启一个tcp server， 当有client连接成功时调用client_connected_cb， 并传入参数reader和writer；</p>
+<p>(16)asyncio.create_subprocess_exec(program, *args, stdin=None, stdout=None, stderr=None, loop=None, limit=None, **kwds)</p>
+<blockquote>
+<p>Create a subprocess.</p>
+</blockquote>
+<p>创建子进程运行program指定的程序；</p>
+<p>(17)asyncio.create_subprocess_shell(cmd, stdin=None, stdout=None, stderr=None, loop=None, limit=None, **kwds)</p>
+<blockquote>
+<p>Run the cmd shell command.</p>
+</blockquote>
+<p>运行shell命令；</p>
+<h3>5 Generator-based Coroutines</h3>
+<pre class="editor-colors lang-python"><span><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">import</span> asyncio</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--keyword syntax--control">import</span> time</span></span>
+<span class=""></span> 
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--entity syntax--name syntax--function syntax--decorator">@asyncio.coroutine</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">say_after</span>(<span class="syntax--variable syntax--parameter syntax--function">delay</span>, <span class="syntax--variable syntax--parameter syntax--function">what</span>, <span class="syntax--variable syntax--parameter syntax--function">task</span><span class="syntax--keyword syntax--operator">=</span><span class="syntax--constant syntax--numeric">0</span>):</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">yield</span> <span class="syntax--keyword syntax--control">from</span> asyncio.<span class="syntax--entity syntax--name syntax--function">sleep</span>(delay)</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(what)</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--entity syntax--name syntax--function syntax--decorator">@asyncio.coroutine</span></span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--storage syntax--type syntax--function">def</span> <span class="syntax--entity syntax--name syntax--function">main</span>():</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>task1 <span class="syntax--keyword syntax--operator">=</span> asyncio.<span class="syntax--entity syntax--name syntax--function">create_task</span>(</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--entity syntax--name syntax--function">say_after</span>(<span class="syntax--constant syntax--numeric">1</span>, <span class="syntax--string syntax--quoted">'hello'</span>))</span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span>task2 <span class="syntax--keyword syntax--operator">=</span> asyncio.<span class="syntax--entity syntax--name syntax--function">create_task</span>(</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">        </span><span class="syntax--entity syntax--name syntax--function">say_after</span>(<span class="syntax--constant syntax--numeric">2</span>, <span class="syntax--string syntax--quoted">'world'</span>, task1))</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">f"started at <span class="syntax--meta syntax--embedded"><span class="syntax--punctuation syntax--section syntax--embedded">{</span>time.<span class="syntax--entity syntax--name syntax--function">strftime</span>(<span class="syntax--string syntax--quoted">'%X'</span>)<span class="syntax--punctuation syntax--section syntax--embedded">}</span></span>"</span>)</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">yield</span> <span class="syntax--keyword syntax--control">from</span> task1</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">yield</span> <span class="syntax--keyword syntax--control">from</span> task2</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--support syntax--function">print</span>(<span class="syntax--string syntax--quoted">f"finished at <span class="syntax--meta syntax--embedded"><span class="syntax--punctuation syntax--section syntax--embedded">{</span>time.<span class="syntax--entity syntax--name syntax--function">strftime</span>(<span class="syntax--string syntax--quoted">'%X'</span>)<span class="syntax--punctuation syntax--section syntax--embedded">}</span></span>"</span>)</span></span>
+<span class=""><span class="syntax--source syntax--python"><span class="leading-whitespace">    </span><span class="syntax--keyword syntax--control">return</span> <span class="syntax--constant syntax--numeric">123</span></span></span>
+<span class=""></span> 
+<span class=""><span class="syntax--source syntax--python"><span class="syntax--comment syntax--line">#a = asyncio.run(main())</span></span></span>
+<span class=""><span class="syntax--source syntax--python">loop <span class="syntax--keyword syntax--operator">=</span> asyncio.<span class="syntax--entity syntax--name syntax--function">get_event_loop</span>()</span></span>
+<span class=""><span class="syntax--source syntax--python">loop.<span class="syntax--entity syntax--name syntax--function">run_until_complete</span>(<span class="syntax--entity syntax--name syntax--function">main</span>())</span></span>
+<span class=""><span class="syntax--source syntax--python">loop.<span class="syntax--entity syntax--name syntax--function">close</span>()</span></span></pre>
+
+  </body>
+</html>

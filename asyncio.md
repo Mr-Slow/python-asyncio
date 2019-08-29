@@ -371,6 +371,7 @@ asyncio.run(main('127.0.0.1', 0))
 
 transport决定数据如何传输(socket)， protocol决定传输什么数据以及何时传递(application)；transport和protocol成对使用，protocol调用transport的方法来发送数据，transport调用protocol的方法来将接受到的数据传递给protocol;
 ##### 2.7.1 transport
+**Transport, DatagramTransport, SubprocessTransport<br>**
 (1)close() / is_closing() / abort()<br>
 close()关闭transport，然后调用protocol.connection_lost()；如果有数据正在传输，等待传输完成;
 abort()立即关闭transport， 正在传输的数据会丢失；
@@ -381,7 +382,7 @@ abort()立即关闭transport， 正在传输的数据会丢失；
 (3)pause_reading() / resume_reading()<br>
 暂停接收数据/恢复接受数据， 用于控制数据接收； 数据接收完成会调用 protocol.data_received()
 
-(4)can_write_eof() / write_eof()
+(4)can_write_eof() / write_eof()<br>
 是否有can_write_eof()方法/在发送完所有数据后关闭transport的输入流；
 
 (5)set_write_buffer_limits(high=None, low=None) / get_write_buffer_limits()
@@ -391,7 +392,65 @@ abort()立即关闭transport， 正在传输的数据会丢失；
 
 >pause_writing() is called when the buffer size becomes greater than or equal to the high value. If writing has been paused, resume_writing() is called when the buffer size becomes less than or equal to the low value.
 
-设置写入数据的缓冲区大小；
+设置写入数据的缓冲区的上下限；当缓冲数据超过high值会调用protocol的pause_writing(), 当缓冲数据大小低于low值将会调用protocol的resume_writing();
+
+(6)write(data) / writelines(list_of_data) <br>
+向transport异步写入数据;
+
+(7)DatagramTransport.sendto(data, addr=None)<br>
+发送数据报格式的数据;
+
+(8)SubprocessTransport.get_pipe_transport(fd)
+>Return the transport for the communication pipe corresponding to the integer file descriptor fd:
++ 0: readable streaming transport of the standard input (stdin), or None if the subprocess was not created with stdin=PIPE
++ 1: writable streaming transport of the standard output (stdout), or None if the subprocess was not created with stdout=PIPE
++ 2: writable streaming transport of the standard error (stderr), or None if the subprocess was not created with stderr=PIPE
+##### 2.7.2 protocol
+protocol用于提供发送的数据,处理接收到的数据, 主要以回调的形式调用;
+(1)connection_made(transport)
+>Called when a connection is made.
+
+当连接建立时调用;
+(2)connection_lost(exc)
+>Called when the connection is lost or closed.
+
+当连接丢失或关闭时调用,exec是异常对象或None;
+
+(3)pause_writing()
+>Called when the transport’s buffer goes over the high watermark.
+
+(4)resume_writing()
+>Called when the transport’s buffer drains below the low watermark.
+
+(5)Protocol.data_received(data)
+>Called when some data is received. data is a non-empty bytes object containing the incoming data.
+
+当transport接收到数据时调用;
+
+(6)Protocol.eof_received()
+>Called when the other end signals it won’t send any more data (for example by calling transport.write_eof(), if the other end also uses asyncio).
+
+当收到另一端停止发送数据的信号时调用, 停止接收数据;
+
+(7)DatagramProtocol.datagram_received(data, addr)<br>
+当transport接收到数据时调用;
+
+(8)SubprocessProtocol.pipe_data_received(fd, data)
+>Called when the child process writes data into its stdout or stderr pipe.
+fd is the integer file descriptor of the pipe.
+
+当子进程将数据写入stdout或stderr时调用;
+
+(9)SubprocessProtocol.pipe_connection_lost(fd, exc)
+>Called when one of the pipes communicating with the child process is closed.
+fd is the integer file descriptor that was closed.
+
+当和子进程通信的管道关闭时调用;
+
+(10)SubprocessProtocol.process_exited()
+>Called when the child process has exited.
+
+当子进程退出时调用;
 #### 2.5 api
 (1)asyncio.run(coro, \*, debug=False)
 > This function runs the passed coroutine, taking care of managing the asyncio event loop and finalizing asynchronous generators.

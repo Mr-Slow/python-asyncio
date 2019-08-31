@@ -179,8 +179,7 @@ asyncio.run(main())
 
 tasks: asyncio.create_task()返回的对象;
 
-Future是一个特殊的低级别等待对象，它表示异步操作的最终结果。
-当等待Future对象时，它意味着协程将会等到Future在其他地方解析。
+Future是一个特殊的底层的内部对象，当等待Future对象时，它意味着协程将会等到Future在其他地方解析。
 #### 3.2 task对象
 >Tasks are used to run coroutines in event loops. If a coroutine awaits on a Future, the Task suspends the execution of the coroutine and waits for the completion of the Future. When the Future is done, the execution of the wrapped coroutine resumes.
 
@@ -666,16 +665,8 @@ asyncio.run(main())
 #     Task C: Compute factorial(4)...
 #     Task C: factorial(4) = 24
 ```
-(5)asyncio.shield(aw, \*, loop=None)
-> Protect an awaitable object from being cancelled.
 
-```python
-res = await shield(something())
-```
-避免任务被取消;
-用于需要取消协程的情况,如果主协程被取消,那么shield可以避免内部的任务被取消;
-
-(6)asyncio.wait_for(aw, timeout, \*, loop=None)
+(5)asyncio.wait_for(aw, timeout, \*, loop=None)
 >Wait for the aw awaitable to complete with a timeout.
 
 异步执行的超时控制, 当超时发生将抛出异常;
@@ -698,7 +689,7 @@ asyncio.run(main())
 #
 #     timeout!
 ```
-(7)asyncio.wait(aws, \*, loop=None, timeout=None, return_when=ALL_COMPLETED)
+(6)asyncio.wait(aws, \*, loop=None, timeout=None, return_when=ALL_COMPLETED)
 >Run awaitable objects in the aws set concurrently and block until the condition specified by return_when.<br>
 Returns two sets of Tasks/Futures: (done, pending).
 
@@ -725,49 +716,45 @@ async def main():
 
 asyncio.run(main(), debug=True)
 ```
-(8)asyncio.as_completed(aws, \*, loop=None, timeout=None)
->Run awaitable objects in the aws set concurrently. Return an iterator of Future objects. Each Future object returned represents the earliest result from the set of the remaining awaitables.
 
-并发执行多个任务,并返回future对象的迭代器;<br>
-
-(9)asyncio.run_coroutine_threadsafe(coro, loop)
+(7)asyncio.run_coroutine_threadsafe(coro, loop)
 >Submit a coroutine to the given event loop. Thread-safe.<br>
 Return a concurrent.futures.Future to wait for the result from another OS thread.
 
 在不同线程中把协程放入给定的事件循环;
 
-(10)asyncio.current_task(loop=None)
+(8)asyncio.current_task(loop=None)
 >Return the currently running Task instance, or None if no task is running.
 
 返回当前正在运行的task对象;
 
-(11)asyncio.all_tasks(loop=None)
+(9)asyncio.all_tasks(loop=None)
 >Return a set of not yet finished Task objects run by the loop.
 
 返回事件循环中所有的task对象;
 
-(12)asyncio.iscoroutine(obj)<br>
+(10)asyncio.iscoroutine(obj)<br>
 判断一个对象是否是协程对象
 
-(13)asyncio.iscoroutinefunction(func)<br>
+(11)asyncio.iscoroutinefunction(func)<br>
 判断一个对象是否是协程函数(async def 或者 @asyncio.coroutine)
 
-(14)asyncio.open_connection(host=None, port=None, \*, loop=None, limit=None, ssl=None, family=0, proto=0, flags=0, sock=None, local_addr=None, server_hostname=None, ssl_handshake_timeout=None)
+(12)asyncio.open_connection(host=None, port=None, \*, loop=None, limit=None, ssl=None, family=0, proto=0, flags=0, sock=None, local_addr=None, server_hostname=None, ssl_handshake_timeout=None)
 >Establish a network connection and return a pair of (reader, writer) objects.
 
 利用给定的参数创建tcp连接，返回reader和writer对象；
 
-(15)asyncio.start_server(client_connected_cb, host=None, port=None, \*, loop=None, limit=None, family=socket.AF_UNSPEC, flags=socket.AI_PASSIVE, sock=None, backlog=100, ssl=None, reuse_address=None, reuse_port=None, ssl_handshake_timeout=None, start_serving=True)¶
+(13)asyncio.start_server(client_connected_cb, host=None, port=None, \*, loop=None, limit=None, family=socket.AF_UNSPEC, flags=socket.AI_PASSIVE, sock=None, backlog=100, ssl=None, reuse_address=None, reuse_port=None, ssl_handshake_timeout=None, start_serving=True)¶
 >Start a socket server.
 
 利用给定参数开启一个tcp server， 当有client连接成功时调用client_connected_cb， 并传入参数reader和writer；
 
-(16)asyncio.create_subprocess_exec(program, \*args, stdin=None, stdout=None, stderr=None, loop=None, limit=None, \**kwds)
+(14)asyncio.create_subprocess_exec(program, \*args, stdin=None, stdout=None, stderr=None, loop=None, limit=None, \**kwds)
 >Create a subprocess.
 
 创建子进程运行program指定的程序；
 
-(17)asyncio.create_subprocess_shell(cmd, stdin=None, stdout=None, stderr=None, loop=None, limit=None, \**kwds)
+(15)asyncio.create_subprocess_shell(cmd, stdin=None, stdout=None, stderr=None, loop=None, limit=None, \**kwds)
 >Run the cmd shell command.
 
 运行shell命令；
